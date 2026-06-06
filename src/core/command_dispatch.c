@@ -25,7 +25,9 @@ static void on_scan_progress(const char *title, const char *artist,
 
 static int updater_thread_func(void *data) {
     PlayerContext *ctx = (PlayerContext *)data;
-    FILE *fp = popen("python3 scripts/updater.py", "r");
+    char cmd_buf[256];
+    snprintf(cmd_buf, sizeof(cmd_buf), "python3 scripts/updater.py \"%s\"", HARMONY_VERSION);
+    FILE *fp = popen(cmd_buf, "r");
     if (!fp) {
         strncpy(ctx->update_status_msg, "Failed to start updater script", sizeof(ctx->update_status_msg) - 1);
         return 0;

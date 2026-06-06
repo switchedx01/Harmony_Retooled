@@ -121,12 +121,23 @@ int main(int argc, char *argv[]) {
         break;
 
       if (evt.type == EVENT_QUIT) {
-        if (!app->headless) {
-            log_message("INFO", "Window closed. Reverting to headless mode.");
-            app->headless = true;
-            material_shutdown();
-            window_shutdown();
+        bool launched_from_engine = false;
+        const char *env_engine = getenv("HARMONY_ENGINE");
+        if (env_engine && strcmp(env_engine, "1") == 0) {
+            launched_from_engine = true;
+        }
+
+        if (launched_from_engine) {
+            if (!app->headless) {
+                log_message("INFO", "Window closed. Reverting to headless mode.");
+                app->headless = true;
+                material_shutdown();
+                window_shutdown();
+            } else {
+                app->running = false;
+            }
         } else {
+            log_message("INFO", "Window closed. Shutting down standalone player.");
             app->running = false;
         }
       } else if (evt.type == EVENT_RESIZED) {

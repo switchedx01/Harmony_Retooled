@@ -1,0 +1,9 @@
+# Compiled test executables
+test_math
+test_offset
+test_scan
+tests/test_playback
+
+# Log files
+*.log
+cli_log.txt

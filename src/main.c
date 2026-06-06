@@ -104,6 +104,9 @@ int main(int argc, char *argv[]) {
     if (app->is_dragging_eq_band && !window_is_mouse_held()) {
       app->is_dragging_eq_band = false;
     }
+    if (app->is_dragging_vis_param && !window_is_mouse_held()) {
+      app->is_dragging_vis_param = false;
+    }
 
     if (layout_needs_update) {
       check_layout_state(app->layout);
@@ -168,6 +171,9 @@ int main(int argc, char *argv[]) {
           } else if (strncmp(cmd, "eq_band_drag_", 13) == 0) {
             app->is_dragging_eq_band = true;
             app->dragging_eq_band_idx = atoi(cmd + 13);
+          } else if (strncmp(cmd, "visualizer_param_drag_", 22) == 0) {
+            app->is_dragging_vis_param = true;
+            app->dragging_vis_param_idx = atoi(cmd + 22);
           }
 
           if (strcmp(cmd, "library_search_focus") != 0 &&
@@ -191,6 +197,7 @@ int main(int argc, char *argv[]) {
         app->is_dragging_seek = false;
         app->is_dragging_vol = false;
         app->is_dragging_eq_band = false;
+        app->is_dragging_vis_param = false;
       } else if (evt.type == EVENT_MOUSEMOTION) {
         int mx, my;
         window_get_mouse_pos(&mx, &my);
@@ -202,6 +209,10 @@ int main(int argc, char *argv[]) {
           static char cmd_buf[64];
           snprintf(cmd_buf, sizeof(cmd_buf), "eq_band_drag_%d", app->dragging_eq_band_idx);
           dispatch_command(app, cmd_buf, my); /* Pass raw Y in mx_context */
+        } else if (app->is_dragging_vis_param) {
+          static char cmd_buf[64];
+          snprintf(cmd_buf, sizeof(cmd_buf), "visualizer_param_drag_%d", app->dragging_vis_param_idx);
+          dispatch_command(app, cmd_buf, mx); /* Pass raw X in mx_context */
         }
       } else if (evt.type == EVENT_MOUSEWHEEL) {
         int mx_w, my_w;

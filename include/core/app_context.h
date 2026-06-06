@@ -18,6 +18,8 @@ typedef struct {
   bool is_dragging_vol;
   bool is_dragging_eq_band;
   int dragging_eq_band_idx;
+  bool is_dragging_vis_param;
+  int dragging_vis_param_idx;
 } AppContext;
 
 /* Global Accessors (Singleton-style for compatibility with existing code) */

@@ -650,20 +650,26 @@ bool dispatch_command(AppContext *ctx, const char *cmd, int mx_context) {
     g_player_ctx->visualizer_show_list = false;
   } else if (strncmp(cmd, "visualizer_param_drag_", 22) == 0) {
     int param_idx = atoi(cmd + 22);
-    /* In this basic version we just set the param to a fixed value or toggle it
-     */
-    /* A complete implementation would handle the drag event with motion like
-     * volume/seek */
     const VisPlugin *active = visualizer_get_active();
     if (active && active->get_param) {
       const VisParam *p = active->get_param(param_idx);
-      if (p && p->type == VIS_PARAM_FLOAT && p->value_ptr) {
-        float *val = (float *)p->value_ptr;
-        *val = p->min + (p->max - p->min) * 0.5f; /* placeholder: sets to mid */
-      } else if (p && p->type == VIS_PARAM_INT && p->value_ptr) {
-        int *val = (int *)p->value_ptr;
-        *val = (int)(p->min +
-                     (p->max - p->min) * 0.5f); /* placeholder: sets to mid */
+      if (p && (p->type == VIS_PARAM_FLOAT || p->type == VIS_PARAM_INT)) {
+        int pad = 40;
+        int x_offset = g_layout_ctx->width - 280; /* SIDEBAR_W = 280 */
+        int slider_x = x_offset + pad;
+        int slider_w = 200;
+        int mx = mx_context;
+        if (mx < slider_x) mx = slider_x;
+        if (mx > slider_x + slider_w) mx = slider_x + slider_w;
+        float pct = (float)(mx - slider_x) / (float)slider_w;
+        
+        if (p->type == VIS_PARAM_FLOAT && p->value_ptr) {
+          float *val = (float *)p->value_ptr;
+          *val = p->min + (p->max - p->min) * pct;
+        } else if (p->type == VIS_PARAM_INT && p->value_ptr) {
+          int *val = (int *)p->value_ptr;
+          *val = (int)(p->min + (p->max - p->min) * pct);
+        }
       }
     }
   } else if (strncmp(cmd, "visualizer_param_toggle_", 24) == 0) {

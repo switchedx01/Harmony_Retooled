@@ -1,0 +1,25 @@
+[INFO] Logging initialized.
+[INFO] Window system initialized.
+[INFO] Audio backend initialized (Lock-Free Ring Buffer).
+[INFO] Player initialized.
+[INFO] Database initialized successfully
+[DEBUG] db_get_all_albums: found 109 albums (grouped: 1)
+[INFO] Library loaded: 109 albums
+[INFO] Material You - Primary: (100,100,255), Secondary: (100,100,255), Tertiary: (100,100,255)
+[INFO] Theme updated from image with advanced color extraction.
+[INFO] Font file read size: 410820
+[INFO] Inspecting font header...
+[INFO] Header: 00 01 00 00
+[INFO] Font Offset: 0
+[INFO] Font Metrics - Asc: 19.45, Desc: -4.55, Scale: 0.0105
+[INFO] Font baked height: 45
+[INFO] Font initialized (Safe Mode).
+[INFO] Loaded visualizer plugin.
+[INFO] Loaded visualizer plugin.
+[INFO] Loaded visualizer plugin.
+[INFO] get_metadata: Starting metadata read for path 'tests/test.mp3'
+[ERROR] Failed to parse metadata for CLI file.
+[INFO] MPRIS: Bus acquired, objects registered.
+[WARNING] MPRIS: Name lost.
+[INFO] Window system shutdown.
+[INFO] Logging shutdown.

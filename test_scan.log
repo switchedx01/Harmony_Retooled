@@ -1,0 +1,34 @@
+[INFO] Logging initialized.
+[INFO] Database initialized successfully
+[INFO] Starting library scan...
+[INFO] Found audio file: ./01 - cyber milk chan - condensed milk.wav
+[INFO] get_metadata: Starting metadata read
+[INFO] get_metadata: Trying WAV format
+[INFO] parse_wav: Found ID3 chunk in WAV file
+[INFO] Extracting album art...
+[INFO] Album art extracted
+[INFO] db_add_track: Attempting insert for ./01 - cyber milk chan - condensed milk.wav
+[INFO] Library scan finished.
+[INFO] Logging initialized.
+[INFO] Database initialized successfully
+[INFO] Starting library scan...
+[INFO] Found audio file: ./01 - cyber milk chan - condensed milk.wav
+[INFO] get_metadata: Starting metadata read
+[INFO] get_metadata: Trying WAV format
+[INFO] parse_wav: Found ID3 chunk in WAV file
+[INFO] Using cached album art
+[INFO] db_add_track: Attempting insert for ./01 - cyber milk chan - condensed milk.wav
+[INFO] Library scan finished.
+[INFO] Starting library scan...
+[INFO] Found audio file: ./01 - cyber milk chan - condensed milk.wav
+[INFO] get_metadata: Starting metadata read
+[INFO] get_metadata: Trying WAV format
+[INFO] parse_wav: Found ID3 chunk in WAV file
+[INFO] Using cached album art
+[INFO] db_add_track: Attempting insert for ./01 - cyber milk chan - condensed milk.wav
+[INFO] Library scan finished.
+[INFO] Logging initialized.
+[INFO] Converting M4A to WAV...
+[INFO] M4A conversion complete
+[INFO] Logging initialized.
+[INFO] Using cached WAV

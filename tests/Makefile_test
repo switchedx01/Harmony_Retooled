@@ -1,0 +1,23 @@
+CC = gcc
+CFLAGS = -std=c99 -Wall -Wextra -I../include -I../include/vendor -D_POSIX_C_SOURCE=200809L
+LDFLAGS = -lm -ldl -lpthread
+
+# Object files needed from main build
+OBJS = ../build/audio/audio_backend.o \
+       ../build/utils/ffmpeg_decoder.o \
+       ../build/utils/logging.o \
+       ../build/utils/ring_buffer.o \
+       ../build/audio/visualizer_buffer.o \
+       ../build/utils/string_utils.o
+
+TARGET = test_playback
+
+all: $(TARGET)
+
+$(TARGET): test_playback.c $(OBJS)
+	$(CC) $(CFLAGS) test_playback.c $(OBJS) -o $(TARGET) $(LDFLAGS)
+
+clean:
+	rm -f $(TARGET) *.o
+
+.PHONY: all clean

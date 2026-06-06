@@ -10,16 +10,20 @@ import shutil
 import stat
 
 REPO = "switchedx01/Harmony_Retooled"
-API_URL = f"https://api.github.com/repos/{REPO}/releases/latest"
+API_URL = f"https://api.github.com/repos/{REPO}/releases"
 
 def main():
     print("Checking for updates...", flush=True)
     try:
         req = urllib.request.Request(API_URL, headers={'User-Agent': 'Harmony-Updater'})
         with urllib.request.urlopen(req) as response:
-            data = json.loads(response.read().decode('utf-8'))
+            releases = json.loads(response.read().decode('utf-8'))
+            if not releases or not isinstance(releases, list):
+                print("No releases found on GitHub.", flush=True)
+                return
             
-            tag_name = data.get('tag_name', 'Unknown')
+            data = releases[0]
+            tag_name = data.get('name', data.get('tag_name', 'Unknown'))
             print(f"Found latest release: {tag_name}", flush=True)
             
             assets = data.get('assets', [])

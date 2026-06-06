@@ -28,7 +28,7 @@ static bool g_debug_view = false;
 
 /* EQ slider geometry shared with command_dispatch for Y→dB mapping */
 int g_eq_slider_top = 0;
-int g_eq_slider_h   = 0;
+int g_eq_slider_h = 0;
 
 /* Unified Grid Calculation Helper */
 int material_get_grid_cols(int w) {
@@ -308,10 +308,9 @@ void material_shutdown(void) {
 
   font_shutdown();
   g_renderer = NULL;
-  
+
   log_message("INFO", "Material renderer and cached textures shut down.");
 }
-
 
 ThemeColors *material_get_theme(void) { return &g_theme; }
 
@@ -1984,7 +1983,8 @@ static void render_library_grid(PlayerContext *ctx, int x, int y, int w,
 
   /* Calculate exact width needed to fill the container perfectly */
   int content_w_area = w - 40; /* 20px padding on left/right edges */
-  int card_w = (cols > 0) ? (content_w_area - (cols - 1) * padding) / cols : base_card_w;
+  int card_w =
+      (cols > 0) ? (content_w_area - (cols - 1) * padding) / cols : base_card_w;
 
   /* Scale height proportionally to maintain the square album art aspect */
   int card_h = 260 + (card_w - base_card_w);
@@ -2384,11 +2384,14 @@ static void render_playlists_scene(SDL_Renderer *renderer, PlayerContext *ctx,
   int card_y = y + (h - card_h) / 2;
 
   /* Draw frosted glass base */
-  material_draw_rounded_rect(card_x, card_y, card_w, card_h, 16, (Color){25, 25, 25}, 200);
+  material_draw_rounded_rect(card_x, card_y, card_w, card_h, 16,
+                             (Color){25, 25, 25}, 200);
 
-  /* Draw a subtle colored top bar using the theme's primary color to feel premium */
+  /* Draw a subtle colored top bar using the theme's primary color to feel
+   * premium */
   SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-  SDL_SetRenderDrawColor(renderer, g_theme.primary.r, g_theme.primary.g, g_theme.primary.b, 255);
+  SDL_SetRenderDrawColor(renderer, g_theme.primary.r, g_theme.primary.g,
+                         g_theme.primary.b, 255);
   SDL_Rect accent_bar = {card_x + 20, card_y, card_w - 40, 3};
   SDL_RenderFillRect(renderer, &accent_bar);
 
@@ -2485,29 +2488,35 @@ static void render_settings_tabs(PlayerContext *ctx, int x, int y, int w) {
   }
 }
 
-static int render_settings_library_folders(PlayerContext *ctx, int x, int y, int w) {
+static int render_settings_library_folders(PlayerContext *ctx, int x, int y,
+                                           int w) {
   font_draw_text(g_renderer, "Library Folders", x, y, 200, 200, 200);
   int current_y = y + 40;
-  
+
   for (size_t i = 0; i < ctx->library_path_count; i++) {
     int item_h = 40;
     int remove_w = font_get_text_width("Remove") + 20;
     int path_w = w - remove_w - 10;
-    
-    material_draw_rounded_rect(x, current_y, path_w, item_h, 6, (Color){40, 40, 40}, 255);
+
+    material_draw_rounded_rect(x, current_y, path_w, item_h, 6,
+                               (Color){40, 40, 40}, 255);
     int ty;
-    font_get_text_center_offset(ctx->library_paths[i].path, 0, item_h, NULL, &ty);
-    font_draw_text_limit(g_renderer, ctx->library_paths[i].path, x + 10, current_y + ty, 255, 255, 255, path_w - 20);
-    
+    font_get_text_center_offset(ctx->library_paths[i].path, 0, item_h, NULL,
+                                &ty);
+    font_draw_text_limit(g_renderer, ctx->library_paths[i].path, x + 10,
+                         current_y + ty, 255, 255, 255, path_w - 20);
+
     int rx = x + path_w + 10;
-    material_draw_rounded_rect(rx, current_y, remove_w, item_h, 6, (Color){150, 50, 50}, 255);
+    material_draw_rounded_rect(rx, current_y, remove_w, item_h, 6,
+                               (Color){150, 50, 50}, 255);
     int r_tw = font_get_text_width("Remove");
     font_get_text_center_offset("Remove", 0, item_h, NULL, &ty);
-    font_draw_text(g_renderer, "Remove", rx + (remove_w - r_tw) / 2, current_y + ty, 255, 255, 255);
-    
+    font_draw_text(g_renderer, "Remove", rx + (remove_w - r_tw) / 2,
+                   current_y + ty, 255, 255, 255);
+
     current_y += item_h + 10;
   }
-  
+
   int btn_h = 40;
   int btw_browse = font_get_text_width("Browse");
   int btn_w_browse = btw_browse + 32;
@@ -2515,26 +2524,34 @@ static int render_settings_library_folders(PlayerContext *ctx, int x, int y, int
   int btn_w_add = btw_add + 32;
   int gap = 10;
   int input_w = w - btn_w_browse - btn_w_add - gap * 2;
-  
-  material_draw_rounded_rect(x, current_y, input_w, btn_h, 6, (Color){80, 80, 80}, 255);
-  material_draw_rounded_rect(x + 1, current_y + 1, input_w - 2, btn_h - 2, 5, (Color){30, 30, 30}, 255);
-  
+
+  material_draw_rounded_rect(x, current_y, input_w, btn_h, 6,
+                             (Color){80, 80, 80}, 255);
+  material_draw_rounded_rect(x + 1, current_y + 1, input_w - 2, btn_h - 2, 5,
+                             (Color){30, 30, 30}, 255);
+
   int ty;
   font_get_text_center_offset("Browse", 0, btn_h, NULL, &ty);
   if (ctx->library_input_buffer[0] != '\0') {
-    font_draw_text_limit(g_renderer, ctx->library_input_buffer, x + 10, current_y + ty, 255, 255, 255, input_w - 20);
+    font_draw_text_limit(g_renderer, ctx->library_input_buffer, x + 10,
+                         current_y + ty, 255, 255, 255, input_w - 20);
   } else {
-    font_draw_text(g_renderer, "Select or type a folder...", x + 10, current_y + ty, 100, 100, 100);
+    font_draw_text(g_renderer, "Select or type a folder...", x + 10,
+                   current_y + ty, 100, 100, 100);
   }
-  
+
   int bx = x + input_w + gap;
-  material_draw_rounded_rect(bx, current_y, btn_w_browse, btn_h, 6, (Color){80, 80, 80}, 255);
-  font_draw_text(g_renderer, "Browse", bx + (btn_w_browse - btw_browse) / 2, current_y + ty, 255, 255, 255);
-  
+  material_draw_rounded_rect(bx, current_y, btn_w_browse, btn_h, 6,
+                             (Color){80, 80, 80}, 255);
+  font_draw_text(g_renderer, "Browse", bx + (btn_w_browse - btw_browse) / 2,
+                 current_y + ty, 255, 255, 255);
+
   int ax = bx + btn_w_browse + gap;
-  material_draw_rounded_rect(ax, current_y, btn_w_add, btn_h, 6, (Color){50, 150, 50}, 255);
-  font_draw_text(g_renderer, "Add", ax + (btn_w_add - btw_add) / 2, current_y + ty, 255, 255, 255);
-  
+  material_draw_rounded_rect(ax, current_y, btn_w_add, btn_h, 6,
+                             (Color){50, 150, 50}, 255);
+  font_draw_text(g_renderer, "Add", ax + (btn_w_add - btw_add) / 2,
+                 current_y + ty, 255, 255, 255);
+
   current_y += btn_h + 30;
   return current_y;
 }
@@ -2551,8 +2568,8 @@ static void render_settings_library_actions(PlayerContext *ctx, int x, int y,
   int ty;
   font_get_text_center_offset("Scan Library", 0, btn_h, NULL, &ty);
   int text_y = y + ty;
-  font_draw_text(g_renderer, "Scan Library", x + (btn_w_scan - btw_scan) / 2, text_y,
-                 255, 255, 255);
+  font_draw_text(g_renderer, "Scan Library", x + (btn_w_scan - btw_scan) / 2,
+                 text_y, 255, 255, 255);
 
   int tx = x + btn_w_scan + 20;
   int toggle_y = y + (btn_h - 20) / 2;
@@ -2584,8 +2601,8 @@ static void render_settings_library_actions(PlayerContext *ctx, int x, int y,
     SDL_RenderFillRect(g_renderer, &inner2);
   }
 
-  font_draw_text(g_renderer, "Clean DB on Scan", toggle2_tx + 30, text_y, 200, 200,
-                 200);
+  font_draw_text(g_renderer, "Clean DB on Scan", toggle2_tx + 30, text_y, 200,
+                 200, 200);
 
   /* Reset Database Button - Red/Warning Color */
   int reset_y = y + 60; /* Added spacing to fit taller buttons */
@@ -2594,8 +2611,8 @@ static void render_settings_library_actions(PlayerContext *ctx, int x, int y,
   material_draw_rounded_rect(x, reset_y, btn_w_reset, btn_h, 6,
                              (Color){180, 50, 50}, 255);
   font_draw_text(g_renderer, "Reset Database",
-                 x + (btn_w_reset - btw_reset) / 2,
-                 reset_y + ty, 255, 255, 255);
+                 x + (btn_w_reset - btw_reset) / 2, reset_y + ty, 255, 255,
+                 255);
 }
 
 static void render_settings_library_tab(PlayerContext *ctx, int x, int y,
@@ -2658,7 +2675,8 @@ static void render_settings_popup(PlayerContext *ctx, int w, int h) {
         SDL_Rect inner = {tx + 4, toggle_y + 4, 12, 12};
         SDL_RenderFillRect(g_renderer, &inner);
       }
-      font_draw_text(g_renderer, "Enable Equalizer (Master Toggle)", tx + 30, current_y + ty_off, 200, 200, 200);
+      font_draw_text(g_renderer, "Enable Equalizer (Master Toggle)", tx + 30,
+                     current_y + ty_off, 200, 200, 200);
       current_y += 40;
     }
 
@@ -2666,10 +2684,15 @@ static void render_settings_popup(PlayerContext *ctx, int w, int h) {
     {
       int btn_w = 200;
       int btn_h = 40;
-      material_draw_rounded_rect(px + 30, current_y, btn_w, btn_h, 6, g_theme.primary, 255);
+      material_draw_rounded_rect(px + 30, current_y, btn_w, btn_h, 6,
+                                 g_theme.primary, 255);
       int btw = font_get_text_width("Open Equalizer UI");
-      int btn_ty; font_get_text_center_offset("Open Equalizer UI", btn_w, btn_h, NULL, &btn_ty);
-      font_draw_text(g_renderer, "Open Equalizer UI", px + 30 + (btn_w - btw) / 2, current_y + btn_ty, 255, 255, 255);
+      int btn_ty;
+      font_get_text_center_offset("Open Equalizer UI", btn_w, btn_h, NULL,
+                                  &btn_ty);
+      font_draw_text(g_renderer, "Open Equalizer UI",
+                     px + 30 + (btn_w - btw) / 2, current_y + btn_ty, 255, 255,
+                     255);
       current_y += 60;
     }
 
@@ -2687,7 +2710,8 @@ static void render_settings_popup(PlayerContext *ctx, int w, int h) {
         SDL_Rect inner = {tx + 4, toggle_y + 4, 12, 12};
         SDL_RenderFillRect(g_renderer, &inner);
       }
-      font_draw_text(g_renderer, "Gapless Playback (Experimental)", tx + 30, current_y + ty_off, 150, 150, 150);
+      font_draw_text(g_renderer, "Gapless Playback (Experimental)", tx + 30,
+                     current_y + ty_off, 150, 150, 150);
       current_y += 40;
     }
 
@@ -2705,25 +2729,32 @@ static void render_settings_popup(PlayerContext *ctx, int w, int h) {
         SDL_Rect inner = {tx + 4, toggle_y + 4, 12, 12};
         SDL_RenderFillRect(g_renderer, &inner);
       }
-      font_draw_text(g_renderer, "Automatic Volume Normalization", tx + 30, current_y + ty_off, 150, 150, 150);
+      font_draw_text(g_renderer, "Automatic Volume Normalization", tx + 30,
+                     current_y + ty_off, 150, 150, 150);
       current_y += 40;
     }
   } else {
-    font_draw_text(g_renderer, "Harmony " HARMONY_VERSION, px + 30, tab_content_y, 255, 255, 255);
-    font_draw_text(g_renderer, "Built with C and SDL2", px + 30, tab_content_y + 40, 150, 150, 150);
+    font_draw_text(g_renderer, "Harmony " HARMONY_VERSION, px + 30,
+                   tab_content_y, 255, 255, 255);
+    font_draw_text(g_renderer, "Built with C and SDL2", px + 30,
+                   tab_content_y + 40, 150, 150, 150);
 
     /* Manual Updater Section */
     int btn_w = 200;
     int btn_h = 40;
     int btn_y = tab_content_y + 80;
-    material_draw_rounded_rect(px + 30, btn_y, btn_w, btn_h, 6, g_theme.primary, 255);
+    material_draw_rounded_rect(px + 30, btn_y, btn_w, btn_h, 6, g_theme.primary,
+                               255);
     int btw = font_get_text_width("Check for Updates");
-    int btn_ty; 
-    font_get_text_center_offset("Check for Updates", btn_w, btn_h, NULL, &btn_ty);
-    font_draw_text(g_renderer, "Check for Updates", px + 30 + (btn_w - btw) / 2, btn_y + btn_ty, 255, 255, 255);
+    int btn_ty;
+    font_get_text_center_offset("Check for Updates", btn_w, btn_h, NULL,
+                                &btn_ty);
+    font_draw_text(g_renderer, "Check for Updates", px + 30 + (btn_w - btw) / 2,
+                   btn_y + btn_ty, 255, 255, 255);
 
     if (ctx->update_status_msg[0] != '\0') {
-      font_draw_text(g_renderer, ctx->update_status_msg, px + 30 + btn_w + 20, btn_y + btn_ty, 200, 200, 200);
+      font_draw_text(g_renderer, ctx->update_status_msg, px + 30 + btn_w + 20,
+                     btn_y + btn_ty, 200, 200, 200);
     }
   }
 
@@ -2736,8 +2767,8 @@ static void render_settings_popup(PlayerContext *ctx, int w, int h) {
   material_draw_rounded_rect(bx, by, btn_w, btn_h, 8, (Color){50, 50, 50}, 255);
   int ty;
   font_get_text_center_offset("Close", 0, btn_h, NULL, &ty);
-  font_draw_text(g_renderer, "Close", bx + (btn_w - btw) / 2,
-                 by + ty, 255, 255, 255);
+  font_draw_text(g_renderer, "Close", bx + (btn_w - btw) / 2, by + ty, 255, 255,
+                 255);
 }
 
 /* ... fill_triangle helper ... */
@@ -2851,17 +2882,25 @@ static void draw_icon_shuffle(int x, int y, int size, Color c) {
   SDL_RenderDrawLine(g_renderer, x, y + 1, x + size - 1, y + size);
 
   // Bottom-left to top-right (broken in middle)
-  SDL_RenderDrawLine(g_renderer, x, y + size, x + size / 3, y + size - size / 3);
-  SDL_RenderDrawLine(g_renderer, x + 1, y + size, x + size / 3, y + size - size / 3 + 1);
-  SDL_RenderDrawLine(g_renderer, x, y + size - 1, x + size / 3 - 1, y + size - size / 3);
+  SDL_RenderDrawLine(g_renderer, x, y + size, x + size / 3,
+                     y + size - size / 3);
+  SDL_RenderDrawLine(g_renderer, x + 1, y + size, x + size / 3,
+                     y + size - size / 3 + 1);
+  SDL_RenderDrawLine(g_renderer, x, y + size - 1, x + size / 3 - 1,
+                     y + size - size / 3);
 
-  SDL_RenderDrawLine(g_renderer, x + size - size / 3, y + size / 3, x + size, y);
-  SDL_RenderDrawLine(g_renderer, x + size - size / 3 + 1, y + size / 3, x + size, y + 1);
-  SDL_RenderDrawLine(g_renderer, x + size - size / 3, y + size / 3 - 1, x + size - 1, y);
+  SDL_RenderDrawLine(g_renderer, x + size - size / 3, y + size / 3, x + size,
+                     y);
+  SDL_RenderDrawLine(g_renderer, x + size - size / 3 + 1, y + size / 3,
+                     x + size, y + 1);
+  SDL_RenderDrawLine(g_renderer, x + size - size / 3, y + size / 3 - 1,
+                     x + size - 1, y);
 
   // Arrowheads
-  draw_aa_triangle(x + size + 2, y + size + 2, x + size - 6, y + size - 2, x + size - 2, y + size - 6, c);
-  draw_aa_triangle(x + size + 2, y - 2, x + size - 6, y + 2, x + size - 2, y + 6, c);
+  draw_aa_triangle(x + size + 2, y + size + 2, x + size - 6, y + size - 2,
+                   x + size - 2, y + size - 6, c);
+  draw_aa_triangle(x + size + 2, y - 2, x + size - 6, y + 2, x + size - 2,
+                   y + 6, c);
 }
 
 static void draw_icon_repeat(int x, int y, int size, Color c) {
@@ -2870,15 +2909,16 @@ static void draw_icon_repeat(int x, int y, int size, Color c) {
   // Top arrow pointing right
   SDL_RenderDrawLine(g_renderer, x + 2, y, x + size - 2, y);
   SDL_RenderDrawLine(g_renderer, x + 2, y + 1, x + size - 2, y + 1);
-  
+
   // Right side down
   SDL_RenderDrawLine(g_renderer, x + size - 2, y, x + size - 2, y + size / 2);
   SDL_RenderDrawLine(g_renderer, x + size - 3, y, x + size - 3, y + size / 2);
-  
+
   // Bottom arrow pointing left
   SDL_RenderDrawLine(g_renderer, x + size - 2, y + size, x + 2, y + size);
-  SDL_RenderDrawLine(g_renderer, x + size - 2, y + size - 1, x + 2, y + size - 1);
-  
+  SDL_RenderDrawLine(g_renderer, x + size - 2, y + size - 1, x + 2,
+                     y + size - 1);
+
   // Left side up
   SDL_RenderDrawLine(g_renderer, x + 2, y + size, x + 2, y + size / 2);
   SDL_RenderDrawLine(g_renderer, x + 3, y + size, x + 3, y + size / 2);
@@ -3103,9 +3143,8 @@ static void render_controls(PlayerContext *ctx, WindowContext *layout, int w,
     /* Triangle */
     int cx = layout->play_button_rect.x + layout->play_button_rect.w / 2;
     int cy = layout->play_button_rect.y + layout->play_button_rect.h / 2;
-    draw_aa_triangle((float)(cx - 10), (float)(cy - 15),
-                     (float)(cx + 15), (float)cy,
-                     (float)(cx - 10), (float)(cy + 15),
+    draw_aa_triangle((float)(cx - 10), (float)(cy - 15), (float)(cx + 15),
+                     (float)cy, (float)(cx - 10), (float)(cy + 15),
                      (Color){255, 255, 255});
   }
 
@@ -3127,8 +3166,8 @@ static void render_controls(PlayerContext *ctx, WindowContext *layout, int w,
     draw_aa_triangle((float)(cx - 3), (float)(cy - 8), (float)(cx + 7),
                      (float)cy, (float)(cx - 3), (float)(cy + 8),
                      (Color){200, 200, 200});
-    material_draw_rounded_rect(cx + 8, cy - 8, 3, 16, 1,
-                               (Color){200, 200, 200}, 255);
+    material_draw_rounded_rect(cx + 8, cy - 8, 3, 16, 1, (Color){200, 200, 200},
+                               255);
   }
 
   /* Shuffle Button - Use cached rect */
@@ -3185,8 +3224,6 @@ static void render_controls(PlayerContext *ctx, WindowContext *layout, int w,
   material_draw_rounded_rect(
       layout->vol_slider_rect.x, layout->vol_slider_rect.y, cur_vol_w,
       layout->vol_slider_rect.h, 2, g_theme.primary, 255);
-
-
 }
 
 /* =========================================================================
@@ -3205,15 +3242,17 @@ static void render_eq_popup(PlayerContext *ctx, int w, int h) {
   /* --- Popup dimensions --- */
   int bands = ctx->eq_band_count;
   /* Safety: Clamp bands to supported 5 or 10 */
-  if (bands != 5 && bands != 10) bands = 5;
+  if (bands != 5 && bands != 10)
+    bands = 5;
 
   int pw = (bands == 10) ? 760 : 520;
   int ph = 460;
-  if (pw > w - 40) pw = w - 40;
-  if (ph > h - 40) ph = h - 40;
+  if (pw > w - 40)
+    pw = w - 40;
+  if (ph > h - 40)
+    ph = h - 40;
   int px = (w - pw) / 2;
   int py = (h - ph) / 2;
-
 
   /* Shadow */
   SDL_SetRenderDrawColor(g_renderer, 0, 0, 0, 80);
@@ -3224,7 +3263,8 @@ static void render_eq_popup(PlayerContext *ctx, int w, int h) {
   material_draw_rounded_rect(px, py, pw, ph, 16, (Color){20, 20, 28}, 255);
 
   /* Subtle top gradient stripe */
-  SDL_SetRenderDrawColor(g_renderer, g_theme.primary.r, g_theme.primary.g, g_theme.primary.b, 30);
+  SDL_SetRenderDrawColor(g_renderer, g_theme.primary.r, g_theme.primary.g,
+                         g_theme.primary.b, 30);
   SDL_Rect stripe = {px, py, pw, 60};
   SDL_RenderFillRect(g_renderer, &stripe);
 
@@ -3252,9 +3292,11 @@ static void render_eq_popup(PlayerContext *ctx, int w, int h) {
   SDL_RenderDrawLine(g_renderer, ax, ay - 3, ax + 6, ay + 3);
   SDL_RenderDrawLine(g_renderer, ax + 6, ay + 3, ax + 12, ay - 3);
   /* Label */
-  int dd_ty; font_get_text_center_offset(ctx->eq_selected_preset_name, dd_w, dd_h, NULL, &dd_ty);
-  font_draw_text_limit(g_renderer, ctx->eq_selected_preset_name,
-                       dd_x + 10, dd_y + dd_ty, 230, 230, 255, dd_w - 30);
+  int dd_ty;
+  font_get_text_center_offset(ctx->eq_selected_preset_name, dd_w, dd_h, NULL,
+                              &dd_ty);
+  font_draw_text_limit(g_renderer, ctx->eq_selected_preset_name, dd_x + 10,
+                       dd_y + dd_ty, 230, 230, 255, dd_w - 30);
 
   /* -----------------------------------------------------------------------
      FREQUENCY RESPONSE CURVE
@@ -3265,28 +3307,32 @@ static void render_eq_popup(PlayerContext *ctx, int w, int h) {
   int curve_h = 60;
 
   /* Grid background */
-  material_draw_rounded_rect(curve_x, curve_y, curve_w, curve_h, 6, (Color){14, 14, 20}, 255);
+  material_draw_rounded_rect(curve_x, curve_y, curve_w, curve_h, 6,
+                             (Color){14, 14, 20}, 255);
   /* Center line (0 dB) */
   SDL_SetRenderDrawBlendMode(g_renderer, SDL_BLENDMODE_BLEND);
   SDL_SetRenderDrawColor(g_renderer, 60, 60, 80, 255);
   int center_y_curve = curve_y + curve_h / 2;
-  SDL_RenderDrawLine(g_renderer, curve_x + 4, center_y_curve, curve_x + curve_w - 4, center_y_curve);
+  SDL_RenderDrawLine(g_renderer, curve_x + 4, center_y_curve,
+                     curve_x + curve_w - 4, center_y_curve);
 
   /* Frequency curve — connect gains as a polyline */
   if (bands > 1) {
     int prev_cx = -1, prev_cy = -1;
     for (int i = 0; i < bands; i++) {
-      if (i >= EQ_BAND_COUNT_MAX) break;
+      if (i >= EQ_BAND_COUNT_MAX)
+        break;
       float t = (float)i / (float)(bands - 1);
       int cx = curve_x + 4 + (int)(t * (curve_w - 8));
-      
+
       /* Safety: Ensure index is within eq_gains range */
       float gain = (i < EQ_BAND_COUNT_MAX) ? ctx->eq_gains[i] : 0.0f;
       float gain_norm = (gain + 12.0f) / 24.0f; /* 0..1 */
       int cy = curve_y + curve_h - 4 - (int)(gain_norm * (curve_h - 8));
 
       if (prev_cx >= 0) {
-        SDL_SetRenderDrawColor(g_renderer, g_theme.primary.r, g_theme.primary.g, g_theme.primary.b, 200);
+        SDL_SetRenderDrawColor(g_renderer, g_theme.primary.r, g_theme.primary.g,
+                               g_theme.primary.b, 200);
         SDL_RenderDrawLine(g_renderer, prev_cx, prev_cy, cx, cy);
         /* Thicker line — draw adjacent lines */
         SDL_RenderDrawLine(g_renderer, prev_cx, prev_cy + 1, cx, cy + 1);
@@ -3302,26 +3348,26 @@ static void render_eq_popup(PlayerContext *ctx, int w, int h) {
     }
   }
 
-
   /* -----------------------------------------------------------------------
      BAND SLIDERS
      ----------------------------------------------------------------------- */
-  int slider_area_y  = curve_y + curve_h + 14;
-  int slider_area_h  = ph - (slider_area_y - py) - 70; /* space for bottom row */
-  int band_slot_w    = (pw - 32) / bands;
-  int slider_h       = slider_area_h - 30; /* room for label below */
+  int slider_area_y = curve_y + curve_h + 14;
+  int slider_area_h = ph - (slider_area_y - py) - 70; /* space for bottom row */
+  int band_slot_w = (pw - 32) / bands;
+  int slider_h = slider_area_h - 30; /* room for label below */
   int slider_w_track = 6;
-  int thumb_r        = 8;
+  int thumb_r = 8;
 
   /* Export slider geometry for command_dispatch Y→dB mapping */
   g_eq_slider_top = slider_area_y;
-  g_eq_slider_h   = slider_h;
+  g_eq_slider_h = slider_h;
 
   static int g_eq_dragging_band = -1; /* track which band thumb is held */
 
   for (int i = 0; i < bands; i++) {
-    if (i >= EQ_BAND_COUNT_MAX) break;
-    
+    if (i >= EQ_BAND_COUNT_MAX)
+      break;
+
     int slot_x = px + 16 + i * band_slot_w;
     int track_x = slot_x + (band_slot_w - slider_w_track) / 2;
 
@@ -3347,15 +3393,17 @@ static void render_eq_popup(PlayerContext *ctx, int w, int h) {
                                  thumb_y - center_y_s, slider_w_track / 2,
                                  (Color){(Uint8)(g_theme.primary.r / 2),
                                          (Uint8)(g_theme.primary.g / 2),
-                                         (Uint8)(g_theme.primary.b / 2)}, 255);
+                                         (Uint8)(g_theme.primary.b / 2)},
+                                 255);
     }
 
     /* Thumb */
-    bool thumb_hover = material_hit_test_rect(track_x - thumb_r * 2, thumb_y - thumb_r,
-                                              slider_w_track + thumb_r * 4, thumb_r * 2,
-                                              mx, my);
+    bool thumb_hover = material_hit_test_rect(
+        track_x - thumb_r * 2, thumb_y - thumb_r, slider_w_track + thumb_r * 4,
+        thumb_r * 2, mx, my);
     int tr = thumb_hover ? thumb_r + 2 : thumb_r;
-    draw_filled_circle(track_x + slider_w_track / 2, thumb_y, tr, (Color){255, 255, 255}, 255);
+    draw_filled_circle(track_x + slider_w_track / 2, thumb_y, tr,
+                       (Color){255, 255, 255}, 255);
 
     /* dB label above thumb — always show when hover or non-zero */
     if (thumb_hover || fabsf(gain) > 0.1f) {
@@ -3363,42 +3411,44 @@ static void render_eq_popup(PlayerContext *ctx, int w, int h) {
       snprintf(db_label, sizeof(db_label), "%+.1f", gain);
       int lw = font_get_text_width(db_label);
       int label_y = thumb_y - 22;
-      if (label_y < py + 2) label_y = py + 2;
+      if (label_y < py + 2)
+        label_y = py + 2;
       /* Small pill background */
       material_draw_rounded_rect(track_x + slider_w_track / 2 - lw / 2 - 4,
-                                 label_y - 2, lw + 8, 18, 4, (Color){40, 40, 55}, 220);
+                                 label_y - 2, lw + 8, 18, 4,
+                                 (Color){40, 40, 55}, 220);
       font_draw_text(g_renderer, db_label,
                      track_x + slider_w_track / 2 - lw / 2, label_y,
                      g_theme.primary.r, g_theme.primary.g, g_theme.primary.b);
     }
 
     /* Frequency label below track */
-    static const char *labels_5[5]  = {"60","250","1k","4k","12k"};
-    static const char *labels_10[10] = {"31","63","125","250","500","1k","2k","4k","8k","16k"};
+    static const char *labels_5[5] = {"60", "250", "1k", "4k", "12k"};
+    static const char *labels_10[10] = {"31", "63", "125", "250", "500",
+                                        "1k", "2k", "4k",  "8k",  "16k"};
     const char *lbl = (bands == 5) ? labels_5[i] : labels_10[i];
     int lbl_w = font_get_text_width(lbl);
-    font_draw_text(g_renderer, lbl,
-                   track_x + slider_w_track / 2 - lbl_w / 2,
-                   slider_area_y + slider_h + 6,
-                   120, 120, 150);
+    font_draw_text(g_renderer, lbl, track_x + slider_w_track / 2 - lbl_w / 2,
+                   slider_area_y + slider_h + 6, 120, 120, 150);
   }
-
 
   /* -----------------------------------------------------------------------
      BOTTOM ACTION ROW
      ----------------------------------------------------------------------- */
   int btn_row_y = py + ph - 54;
-  int btn_h     = 34;
+  int btn_h = 34;
 
   /* EQ Enabled toggle pill — far left */
   int en_w = 70;
   Color en_bg = ctx->eq_enabled ? g_theme.primary : (Color){50, 50, 65};
-  material_draw_rounded_rect(px + 16, btn_row_y, en_w, btn_h, btn_h / 2, en_bg, 255);
+  material_draw_rounded_rect(px + 16, btn_row_y, en_w, btn_h, btn_h / 2, en_bg,
+                             255);
   int en_tw = font_get_text_width(ctx->eq_enabled ? "ON" : "OFF");
   int en_ty;
   font_get_text_center_offset("ON", en_w, btn_h, NULL, &en_ty);
   font_draw_text(g_renderer, ctx->eq_enabled ? "ON" : "OFF",
-                 px + 16 + (en_w - en_tw) / 2, btn_row_y + en_ty, 255, 255, 255);
+                 px + 16 + (en_w - en_tw) / 2, btn_row_y + en_ty, 255, 255,
+                 255);
 
   /* Save + Delete — conditional on new/user-preset mode */
   int action_x = px + 16 + en_w + 12;
@@ -3406,19 +3456,24 @@ static void render_eq_popup(PlayerContext *ctx, int w, int h) {
   if (ctx->eq_is_new_mode) {
     /* Name input field */
     int inp_w = 160;
-    int ty_inp; font_get_text_center_offset("Preset", inp_w, btn_h, NULL, &ty_inp);
-    material_draw_rounded_rect(action_x, btn_row_y, inp_w, btn_h, 6, (Color){35, 35, 50}, 255);
-    material_draw_rounded_rect(action_x + 1, btn_row_y + 1, inp_w - 2, btn_h - 2, 5,
-                               (Color){20, 20, 32}, 255);
+    int ty_inp;
+    font_get_text_center_offset("Preset", inp_w, btn_h, NULL, &ty_inp);
+    material_draw_rounded_rect(action_x, btn_row_y, inp_w, btn_h, 6,
+                               (Color){35, 35, 50}, 255);
+    material_draw_rounded_rect(action_x + 1, btn_row_y + 1, inp_w - 2,
+                               btn_h - 2, 5, (Color){20, 20, 32}, 255);
     if (ctx->eq_new_preset_name[0] != '\0') {
-      font_draw_text_limit(g_renderer, ctx->eq_new_preset_name,
-                           action_x + 8, btn_row_y + ty_inp, 220, 220, 255, inp_w - 16);
+      font_draw_text_limit(g_renderer, ctx->eq_new_preset_name, action_x + 8,
+                           btn_row_y + ty_inp, 220, 220, 255, inp_w - 16);
     } else {
-      font_draw_text(g_renderer, "Preset name...", action_x + 8, btn_row_y + ty_inp, 80, 80, 100);
+      font_draw_text(g_renderer, "Preset name...", action_x + 8,
+                     btn_row_y + ty_inp, 80, 80, 100);
     }
     /* Blinking cursor */
     if (ctx->eq_typing_preset_name && (SDL_GetTicks() / 500) % 2 == 0) {
-      int cur_tw = ctx->eq_new_preset_name[0] ? font_get_text_width(ctx->eq_new_preset_name) : 0;
+      int cur_tw = ctx->eq_new_preset_name[0]
+                       ? font_get_text_width(ctx->eq_new_preset_name)
+                       : 0;
       SDL_SetRenderDrawColor(g_renderer, 200, 200, 255, 255);
       SDL_RenderDrawLine(g_renderer, action_x + 8 + cur_tw, btn_row_y + 8,
                          action_x + 8 + cur_tw, btn_row_y + btn_h - 8);
@@ -3428,34 +3483,40 @@ static void render_eq_popup(PlayerContext *ctx, int w, int h) {
     /* Save button */
     bool can_save = ctx->eq_new_preset_name[0] != '\0';
     int sv_tw = font_get_text_width("Save");
-    int sv_w  = sv_tw + 24;
-    int sv_ty; font_get_text_center_offset("Save", sv_w, btn_h, NULL, &sv_ty);
+    int sv_w = sv_tw + 24;
+    int sv_ty;
+    font_get_text_center_offset("Save", sv_w, btn_h, NULL, &sv_ty);
     Color sv_bg = can_save ? (Color){40, 160, 80} : (Color){40, 50, 40};
     material_draw_rounded_rect(action_x, btn_row_y, sv_w, btn_h, 6, sv_bg, 255);
-    font_draw_text(g_renderer, "Save", action_x + (sv_w - sv_tw) / 2, btn_row_y + sv_ty,
-                   255, 255, 255);
+    font_draw_text(g_renderer, "Save", action_x + (sv_w - sv_tw) / 2,
+                   btn_row_y + sv_ty, 255, 255, 255);
     action_x += sv_w + 8;
   } else if (ctx->eq_selected_preset_id >= 0) {
     /* Delete button for user-owned presets */
     int dl_tw = font_get_text_width("Delete");
-    int dl_w  = dl_tw + 24;
-    int dl_ty; font_get_text_center_offset("Delete", dl_w, btn_h, NULL, &dl_ty);
-    material_draw_rounded_rect(action_x, btn_row_y, dl_w, btn_h, 6, (Color){160, 40, 40}, 255);
-    font_draw_text(g_renderer, "Delete", action_x + (dl_w - dl_tw) / 2, btn_row_y + dl_ty,
-                   255, 255, 255);
+    int dl_w = dl_tw + 24;
+    int dl_ty;
+    font_get_text_center_offset("Delete", dl_w, btn_h, NULL, &dl_ty);
+    material_draw_rounded_rect(action_x, btn_row_y, dl_w, btn_h, 6,
+                               (Color){160, 40, 40}, 255);
+    font_draw_text(g_renderer, "Delete", action_x + (dl_w - dl_tw) / 2,
+                   btn_row_y + dl_ty, 255, 255, 255);
     action_x += dl_w + 8;
   }
 
   /* Band Count Selection — center/right of action row */
   /* Close button — far right */
   int cl_tw = font_get_text_width("Close");
-  int cl_w  = cl_tw + 24;
-  int cl_x  = px + pw - cl_w - 16;
-  int cl_ty; font_get_text_center_offset("Close", cl_w, btn_h, NULL, &cl_ty);
+  int cl_w = cl_tw + 24;
+  int cl_x = px + pw - cl_w - 16;
+  int cl_ty;
+  font_get_text_center_offset("Close", cl_w, btn_h, NULL, &cl_ty);
   bool cl_hov = material_hit_test_rect(cl_x, btn_row_y, cl_w, btn_h, mx, my);
   material_draw_rounded_rect(cl_x, btn_row_y, cl_w, btn_h, 6,
-                             cl_hov ? (Color){80, 80, 95} : (Color){50, 50, 65}, 255);
-  font_draw_text(g_renderer, "Close", cl_x + (cl_w - cl_tw) / 2, btn_row_y + cl_ty, 200, 200, 220);
+                             cl_hov ? (Color){80, 80, 95} : (Color){50, 50, 65},
+                             255);
+  font_draw_text(g_renderer, "Close", cl_x + (cl_w - cl_tw) / 2,
+                 btn_row_y + cl_ty, 200, 200, 220);
 
   /* Band Count Selection — center/right of action row (placed next to Close) */
   {
@@ -3463,22 +3524,28 @@ static void render_eq_popup(PlayerContext *ctx, int w, int h) {
     int toggle_h = 32;
     int toggle_x = cl_x - toggle_w - 24;
     int toggle_y = btn_row_y;
-    
-    material_draw_rounded_rect(toggle_x, toggle_y, toggle_w, toggle_h, toggle_h / 2,
-                               (Color){40, 40, 55}, 255);
-                               
+
+    material_draw_rounded_rect(toggle_x, toggle_y, toggle_w, toggle_h,
+                               toggle_h / 2, (Color){40, 40, 55}, 255);
+
     int half_w = toggle_w / 2;
     if (ctx->eq_band_count == 5)
-      material_draw_rounded_rect(toggle_x, toggle_y, half_w, toggle_h, toggle_h / 2, g_theme.primary, 255);
+      material_draw_rounded_rect(toggle_x, toggle_y, half_w, toggle_h,
+                                 toggle_h / 2, g_theme.primary, 255);
     if (ctx->eq_band_count == 10)
-      material_draw_rounded_rect(toggle_x + half_w, toggle_y, half_w, toggle_h, toggle_h / 2, g_theme.primary, 255);
-      
+      material_draw_rounded_rect(toggle_x + half_w, toggle_y, half_w, toggle_h,
+                                 toggle_h / 2, g_theme.primary, 255);
+
     int tw5 = font_get_text_width("5");
-    int ty5; font_get_text_center_offset("5", half_w, toggle_h, NULL, &ty5);
-    font_draw_text(g_renderer, "5", toggle_x + (half_w - tw5) / 2, toggle_y + ty5, 255, 255, 255);
+    int ty5;
+    font_get_text_center_offset("5", half_w, toggle_h, NULL, &ty5);
+    font_draw_text(g_renderer, "5", toggle_x + (half_w - tw5) / 2,
+                   toggle_y + ty5, 255, 255, 255);
     int tw10 = font_get_text_width("10");
-    int ty10; font_get_text_center_offset("10", half_w, toggle_h, NULL, &ty10);
-    font_draw_text(g_renderer, "10", toggle_x + half_w + (half_w - tw10) / 2, toggle_y + ty10, 255, 255, 255);
+    int ty10;
+    font_get_text_center_offset("10", half_w, toggle_h, NULL, &ty10);
+    font_draw_text(g_renderer, "10", toggle_x + half_w + (half_w - tw10) / 2,
+                   toggle_y + ty10, 255, 255, 255);
   }
 
   /* -----------------------------------------------------------------------
@@ -3486,17 +3553,17 @@ static void render_eq_popup(PlayerContext *ctx, int w, int h) {
      ----------------------------------------------------------------------- */
   if (ctx->eq_dropdown_open) {
     static const char *builtin_names[] = {
-      "Flat","Bass Boost","Treble","Rock","Pop","Classical","Vocal"
-    };
+        "Flat", "Bass Boost", "Treble", "Rock", "Pop", "Classical", "Vocal"};
     int n_builtin = 7;
-    int n_user    = (int)ctx->eq_preset_count;
-    int n_items   = n_builtin + n_user + 1; /* +1 for separator+New row */
-    int item_h    = 32;
-    int dw        = 220;
-    int dh        = n_items * item_h + 8;
-    int dx        = px + 16;
-    int dy        = top_y + dd_h + 4;
-    if (dy + dh > py + ph) dy = top_y - dh - 4; /* flip up if off-screen */
+    int n_user = (int)ctx->eq_preset_count;
+    int n_items = n_builtin + n_user + 1; /* +1 for separator+New row */
+    int item_h = 32;
+    int dw = 220;
+    int dh = n_items * item_h + 8;
+    int dx = px + 16;
+    int dy = top_y + dd_h + 4;
+    if (dy + dh > py + ph)
+      dy = top_y - dh - 4; /* flip up if off-screen */
 
     /* Shadow */
     SDL_SetRenderDrawColor(g_renderer, 0, 0, 0, 100);
@@ -3506,7 +3573,8 @@ static void render_eq_popup(PlayerContext *ctx, int w, int h) {
 
     int iy = dy + 4;
 
-    int dd_item_ty; font_get_text_center_offset("Flat", dw, item_h, NULL, &dd_item_ty);
+    int dd_item_ty;
+    font_get_text_center_offset("Flat", dw, item_h, NULL, &dd_item_ty);
     /* Built-in presets */
     for (int i = 0; i < n_builtin; i++) {
       bool hov = material_hit_test_rect(dx, iy, dw, item_h, mx, my);
@@ -3527,25 +3595,26 @@ static void render_eq_popup(PlayerContext *ctx, int w, int h) {
     /* User presets */
     if (ctx->eq_presets) {
       for (int i = 0; i < n_user; i++) {
-      bool hov = material_hit_test_rect(dx, iy, dw, item_h, mx, my);
-      bool sel = (ctx->eq_selected_preset_id == ctx->eq_presets[i].id);
-      if (hov || sel) {
-        SDL_SetRenderDrawColor(g_renderer, sel ? g_theme.primary.r : 50,
-                               sel ? g_theme.primary.g : 50,
-                               sel ? g_theme.primary.b : 65, 255);
-        SDL_Rect hr = {dx, iy, dw, item_h};
-        SDL_RenderFillRect(g_renderer, &hr);
+        bool hov = material_hit_test_rect(dx, iy, dw, item_h, mx, my);
+        bool sel = (ctx->eq_selected_preset_id == ctx->eq_presets[i].id);
+        if (hov || sel) {
+          SDL_SetRenderDrawColor(g_renderer, sel ? g_theme.primary.r : 50,
+                                 sel ? g_theme.primary.g : 50,
+                                 sel ? g_theme.primary.b : 65, 255);
+          SDL_Rect hr = {dx, iy, dw, item_h};
+          SDL_RenderFillRect(g_renderer, &hr);
+        }
+        font_draw_text(g_renderer, ctx->eq_presets[i].name, dx + 14,
+                       iy + dd_item_ty, sel ? 255 : 210, sel ? 255 : 210,
+                       sel ? 255 : 225);
+        iy += item_h;
       }
-      font_draw_text(g_renderer, ctx->eq_presets[i].name, dx + 14, iy + dd_item_ty,
-                     sel ? 255 : 210, sel ? 255 : 210, sel ? 255 : 225);
-      iy += item_h;
     }
-  }
 
     /* Separator */
     SDL_SetRenderDrawColor(g_renderer, 55, 55, 70, 255);
-    SDL_RenderDrawLine(g_renderer, dx + 10, iy + item_h / 2 - 1,
-                       dx + dw - 10, iy + item_h / 2 - 1);
+    SDL_RenderDrawLine(g_renderer, dx + 10, iy + item_h / 2 - 1, dx + dw - 10,
+                       iy + item_h / 2 - 1);
 
     /* New row */
     bool hov_new = material_hit_test_rect(dx, iy, dw, item_h, mx, my);
@@ -3554,7 +3623,8 @@ static void render_eq_popup(PlayerContext *ctx, int w, int h) {
       SDL_Rect hr = {dx, iy, dw, item_h};
       SDL_RenderFillRect(g_renderer, &hr);
     }
-    font_draw_text(g_renderer, "+ New Preset", dx + 14, iy + dd_item_ty, 160, 210, 160);
+    font_draw_text(g_renderer, "+ New Preset", dx + 14, iy + dd_item_ty, 160,
+                   210, 160);
   }
 
   (void)g_eq_dragging_band;
@@ -3909,9 +3979,10 @@ void material_render(PlayerContext *ctx, WindowContext *layout) {
   static bool size_logged = false;
   if (!size_logged) {
     char size_msg[256];
-    snprintf(size_msg, sizeof(size_msg), 
-             "material_renderer: sizeof(PlayerContext)=%zu, g_theme=%p, presets=%p", 
-             sizeof(PlayerContext), (void*)&g_theme, (void*)ctx->eq_presets);
+    snprintf(
+        size_msg, sizeof(size_msg),
+        "material_renderer: sizeof(PlayerContext)=%zu, g_theme=%p, presets=%p",
+        sizeof(PlayerContext), (void *)&g_theme, (void *)ctx->eq_presets);
     log_message("DEBUG", size_msg);
 
     size_logged = true;
@@ -4052,8 +4123,10 @@ const char *material_hit_test(PlayerContext *ctx, WindowContext *layout, int mx,
     int bands = ctx->eq_band_count;
     int pw = (bands == 10) ? 760 : 520;
     int ph = 460;
-    if (pw > w - 40) pw = w - 40;
-    if (ph > h - 40) ph = h - 40;
+    if (pw > w - 40)
+      pw = w - 40;
+    if (ph > h - 40)
+      ph = h - 40;
     int px = (w - pw) / 2;
     int py = (h - ph) / 2;
 
@@ -4069,7 +4142,8 @@ const char *material_hit_test(PlayerContext *ctx, WindowContext *layout, int mx,
       int n_items = n_builtin + n_user + 1;
       int dh = n_items * item_h + 8;
       int dy = top_y + dd_h + 4;
-      if (dy + dh > py + ph) dy = top_y - dh - 4;
+      if (dy + dh > py + ph)
+        dy = top_y - dh - 4;
 
       if (mx >= dd_x && mx <= dd_x + dw && my >= dy && my <= dy + dh) {
         int iy = dy + 4;
@@ -4096,7 +4170,7 @@ const char *material_hit_test(PlayerContext *ctx, WindowContext *layout, int mx,
         /* Separator row? Just skip. New Preset at the bottom */
         iy += item_h;
         if (my >= iy - item_h && my < iy) {
-            return "eq_preset_new";
+          return "eq_preset_new";
         }
         return "blocked";
       }
@@ -4105,8 +4179,8 @@ const char *material_hit_test(PlayerContext *ctx, WindowContext *layout, int mx,
 
     /* Action Row Buttons */
     int btn_row_y = py + ph - 54;
-    int cl_x      = px + pw - (font_get_text_width("Close") + 24) - 16;
-    
+    int cl_x = px + pw - (font_get_text_width("Close") + 24) - 16;
+
     /* Band Count Toggle in Action Row */
     if (material_hit_test_rect(cl_x - 100 - 24, btn_row_y, 100, 32, mx, my)) {
       return "eq_toggle_bands";
@@ -4134,12 +4208,12 @@ const char *material_hit_test(PlayerContext *ctx, WindowContext *layout, int mx,
 
     /* ON/OFF toggle */
     if (material_hit_test_rect(px + 16, btn_row_y, 70, btn_h, mx, my)) {
-        return "eq_toggle_enabled";
+      return "eq_toggle_enabled";
     }
 
     /* Dropdown toggle */
     if (material_hit_test_rect(px + 16, py + 14, 200, 32, mx, my)) {
-        return "eq_dropdown_open";
+      return "eq_dropdown_open";
     }
 
     /* Save/Delete */
@@ -4148,30 +4222,33 @@ const char *material_hit_test(PlayerContext *ctx, WindowContext *layout, int mx,
     if (ctx->eq_is_new_mode) {
       /* Name input field */
       if (material_hit_test_rect(action_x, btn_row_y, 160, btn_h, mx, my)) {
-          return "eq_focus_name";
+        return "eq_focus_name";
       }
       action_x += 160 + 8;
       /* Save */
       int sv_tw = font_get_text_width("Save");
-      if (material_hit_test_rect(action_x, btn_row_y, sv_tw + 24, btn_h, mx, my)) {
-          return "eq_preset_save";
+      if (material_hit_test_rect(action_x, btn_row_y, sv_tw + 24, btn_h, mx,
+                                 my)) {
+        return "eq_preset_save";
       }
     } else if (ctx->eq_selected_preset_id >= 0) {
       int dl_tw = font_get_text_width("Delete");
-      if (material_hit_test_rect(action_x, btn_row_y, dl_tw + 24, btn_h, mx, my)) {
-          return "eq_preset_delete";
+      if (material_hit_test_rect(action_x, btn_row_y, dl_tw + 24, btn_h, mx,
+                                 my)) {
+        return "eq_preset_delete";
       }
     }
 
     /* Close */
     int cl_tw = font_get_text_width("Close");
     int cl_w = cl_tw + 24;
-    if (material_hit_test_rect(px + pw - cl_w - 16, btn_row_y, cl_w, btn_h, mx, my)) {
-        return "close_eq";
+    if (material_hit_test_rect(px + pw - cl_w - 16, btn_row_y, cl_w, btn_h, mx,
+                               my)) {
+      return "close_eq";
     }
 
     if (!material_hit_test_rect(px, py, pw, ph, mx, my)) {
-        return "close_eq";
+      return "close_eq";
     }
     return "blocked";
   }
@@ -4221,14 +4298,14 @@ const char *material_hit_test(PlayerContext *ctx, WindowContext *layout, int mx,
       int content_y = py + 80;
       int cx = px + 30;
       int cw = pw - 60;
-      
+
       int current_y = content_y + 40;
       for (size_t i = 0; i < ctx->library_path_count; i++) {
         int item_h = 40;
         int remove_w = font_get_text_width("Remove") + 20;
         int path_w = cw - remove_w - 10;
         int rx = cx + path_w + 10;
-        
+
         if (material_hit_test_rect(rx, current_y, remove_w, item_h, mx, my)) {
           static char cmd[64];
           snprintf(cmd, sizeof(cmd), "settings_remove_folder_%zu", i);
@@ -4236,7 +4313,7 @@ const char *material_hit_test(PlayerContext *ctx, WindowContext *layout, int mx,
         }
         current_y += item_h + 10;
       }
-      
+
       int btn_h = 40;
       int btw_browse = font_get_text_width("Browse");
       int btn_w_browse = btw_browse + 32;
@@ -4244,29 +4321,29 @@ const char *material_hit_test(PlayerContext *ctx, WindowContext *layout, int mx,
       int btn_w_add = btw_add + 32;
       int gap = 10;
       int input_w = cw - btn_w_browse - btn_w_add - gap * 2;
-      
+
       if (material_hit_test_rect(cx, current_y, input_w, btn_h, mx, my)) {
         return "settings_focus_input";
       }
-      
+
       int bx = cx + input_w + gap;
       if (material_hit_test_rect(bx, current_y, btn_w_browse, btn_h, mx, my)) {
         return "settings_browse";
       }
-      
+
       int ax = bx + btn_w_browse + gap;
       if (material_hit_test_rect(ax, current_y, btn_w_add, btn_h, mx, my)) {
         return "settings_add_folder";
       }
-      
+
       current_y += btn_h + 30;
-      
+
       int btw_scan = font_get_text_width("Scan Library");
       int btn_w_scan = btw_scan + 32;
       if (material_hit_test_rect(cx, current_y, btn_w_scan, btn_h, mx, my)) {
         return "settings_scan_library";
       }
-      
+
       int tx = cx + btn_w_scan + 20;
       int toggle_y = current_y + (btn_h - 20) / 2;
       if (material_hit_test_rect(tx, toggle_y, 20, 20, mx, my)) {
@@ -4279,7 +4356,7 @@ const char *material_hit_test(PlayerContext *ctx, WindowContext *layout, int mx,
       if (material_hit_test_rect(toggle2_tx, toggle_y, 20, 20, mx, my)) {
         return "settings_toggle_clean_db";
       }
-      
+
       int reset_y = current_y + 60;
       int btw_reset = font_get_text_width("Reset Database");
       int btn_w_reset = btw_reset + 32;
@@ -4292,7 +4369,8 @@ const char *material_hit_test(PlayerContext *ctx, WindowContext *layout, int mx,
       int current_y = content_y;
 
       /* Master EQ Toggle */
-      if (material_hit_test_rect(cx, current_y + (30 - 20) / 2, 20, 20, mx, my)) {
+      if (material_hit_test_rect(cx, current_y + (30 - 20) / 2, 20, 20, mx,
+                                 my)) {
         return "eq_toggle_enabled";
       }
       current_y += 40;
@@ -4304,13 +4382,15 @@ const char *material_hit_test(PlayerContext *ctx, WindowContext *layout, int mx,
       current_y += 60;
 
       /* Gapless Toggle */
-      if (material_hit_test_rect(cx, current_y + (30 - 20) / 2, 20, 20, mx, my)) {
+      if (material_hit_test_rect(cx, current_y + (30 - 20) / 2, 20, 20, mx,
+                                 my)) {
         return "settings_toggle_gapless";
       }
       current_y += 40;
 
       /* Normalization Toggle */
-      if (material_hit_test_rect(cx, current_y + (30 - 20) / 2, 20, 20, mx, my)) {
+      if (material_hit_test_rect(cx, current_y + (30 - 20) / 2, 20, 20, mx,
+                                 my)) {
         return "settings_toggle_normalization";
       }
     } else if (ctx->settings_active_tab == 2) {
@@ -4590,8 +4670,6 @@ const char *material_hit_test(PlayerContext *ctx, WindowContext *layout, int mx,
     if (is_right_click) {
       return "now_playing_spotlight";
     }
-
-
   }
 
   /* Sidebars */
@@ -4752,16 +4830,16 @@ const char *material_hit_test(PlayerContext *ctx, WindowContext *layout, int mx,
       if (mx >= x_offset + 40 && mx <= w && my >= start_y) {
         int idx = (my - start_y + (int)ctx->sidebar_right_scroll_y) / 50;
         size_t list_count = 0;
-        
+
         if (ctx->sidebar_is_browsing) {
-            list_count = ctx->browse_track_count;
+          list_count = ctx->browse_track_count;
         } else if (ctx->queue_type == QUEUE_TYPE_ALBUM ||
                    ctx->queue_type == QUEUE_TYPE_PLAYLIST) {
-            list_count = ctx->count;
+          list_count = ctx->count;
         } else {
-            list_count = ctx->recents_count;
+          list_count = ctx->recents_count;
         }
-        
+
         if (idx >= 0 && idx < (int)list_count) {
           ctx->spotlight_source_rect.x = x_offset + 40;
           ctx->spotlight_source_rect.y =
@@ -5132,9 +5210,11 @@ const char *material_hit_test(PlayerContext *ctx, WindowContext *layout, int mx,
           int padding = 20;
 
           int cols = material_get_grid_cols(content_w);
-          
+
           int content_w_area = content_w - 40;
-          int card_w = (cols > 0) ? (content_w_area - (cols - 1) * padding) / cols : base_card_w;
+          int card_w = (cols > 0)
+                           ? (content_w_area - (cols - 1) * padding) / cols
+                           : base_card_w;
           int card_h = 260 + (card_w - base_card_w);
 
           /* Header + "Albums" Text Offset */

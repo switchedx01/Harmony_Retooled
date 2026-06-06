@@ -4,7 +4,7 @@
 #include "common.h"
 #include "database.h" /* pulls in EQ_BAND_COUNT_MAX + EqPreset */
 
-#define HARMONY_VERSION "v2.0.02-beta (Moonlight)"
+#define HARMONY_VERSION "v2.0.01-beta (Moonlight)"
 
 typedef enum {
   PLAYER_STATE_STOPPED,

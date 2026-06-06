@@ -44,12 +44,12 @@ def main():
                 return
             
             data = releases[0]
-            tag_name = data.get('name', data.get('tag_name', 'Unknown'))
+            tag_name = data.get('name') or data.get('tag_name', 'Unknown')
             print(f"Latest release: {tag_name}", flush=True)
             
             tag_name_clean = tag_name.lower().replace("harmony ", "").strip()
             
-            if current_version_clean and current_version_clean == tag_name_clean:
+            if current_version_clean and tag_name_clean in current_version_clean:
                 print("Already up to date.", flush=True)
                 return
 
@@ -103,6 +103,8 @@ def main():
                     if repo_dir:
                         print("Building from source...", flush=True)
                         import subprocess
+                        # Run make clean to ensure any accidentally committed binaries are removed
+                        subprocess.run(['make', 'clean'], cwd=repo_dir, capture_output=True)
                         # Run make inside the repo directory
                         result = subprocess.run(['make'], cwd=repo_dir, capture_output=True, text=True)
                         if result.returncode == 0:

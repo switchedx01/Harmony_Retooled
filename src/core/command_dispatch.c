@@ -471,6 +471,9 @@ bool dispatch_command(AppContext *ctx, const char *cmd, int mx_context) {
             
     SDL_CreateThread(updater_thread_func, "UpdaterThread", g_player_ctx);
     
+  } else if (strcmp(cmd, "settings_restart_app") == 0) {
+    system("./harmony_player &");
+    exit(0);
   } else if (strcmp(cmd, "settings_reset_database") == 0) {
     /* Show confirmation dialog instead of resetting immediately */
     g_player_ctx->confirm_dialog_open = true;

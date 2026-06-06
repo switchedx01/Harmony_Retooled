@@ -2924,19 +2924,24 @@ static void draw_aa_triangle(float x1, float y1, float x2, float y2, float x3,
 static void draw_icon_shuffle(int x, int y, int size, Color c) {
   SDL_SetRenderDrawColor(g_renderer, c.r, c.g, c.b, 255);
 
-  // Crossed arrows
+  // Crossed arrows, thick lines (2px)
   // Top-left to bottom-right
   SDL_RenderDrawLine(g_renderer, x, y, x + size, y + size);
+  SDL_RenderDrawLine(g_renderer, x + 1, y, x + size, y + size - 1);
+  SDL_RenderDrawLine(g_renderer, x, y + 1, x + size - 1, y + size);
+
   // Bottom-left to top-right (broken in middle)
-  SDL_RenderDrawLine(g_renderer, x, y + size, x + size / 3,
-                     y + size - size / 3);
-  SDL_RenderDrawLine(g_renderer, x + size - size / 3, y + size / 3, x + size,
-                     y);
+  SDL_RenderDrawLine(g_renderer, x, y + size, x + size / 3, y + size - size / 3);
+  SDL_RenderDrawLine(g_renderer, x + 1, y + size, x + size / 3, y + size - size / 3 + 1);
+  SDL_RenderDrawLine(g_renderer, x, y + size - 1, x + size / 3 - 1, y + size - size / 3);
+
+  SDL_RenderDrawLine(g_renderer, x + size - size / 3, y + size / 3, x + size, y);
+  SDL_RenderDrawLine(g_renderer, x + size - size / 3 + 1, y + size / 3, x + size, y + 1);
+  SDL_RenderDrawLine(g_renderer, x + size - size / 3, y + size / 3 - 1, x + size - 1, y);
 
   // Arrowheads
-  draw_aa_triangle(x + size, y + size, x + size - 4, y + size - 2, x + size - 2,
-                   y + size - 4, c);
-  draw_aa_triangle(x + size, y, x + size - 4, y + 2, x + size - 2, y + 4, c);
+  draw_aa_triangle(x + size + 2, y + size + 2, x + size - 6, y + size - 2, x + size - 2, y + size - 6, c);
+  draw_aa_triangle(x + size + 2, y - 2, x + size - 6, y + 2, x + size - 2, y + 6, c);
 }
 
 static void draw_icon_repeat(int x, int y, int size, Color c) {
@@ -2944,16 +2949,22 @@ static void draw_icon_repeat(int x, int y, int size, Color c) {
 
   // Top arrow pointing right
   SDL_RenderDrawLine(g_renderer, x + 2, y, x + size - 2, y);
+  SDL_RenderDrawLine(g_renderer, x + 2, y + 1, x + size - 2, y + 1);
+  
   // Right side down
   SDL_RenderDrawLine(g_renderer, x + size - 2, y, x + size - 2, y + size / 2);
+  SDL_RenderDrawLine(g_renderer, x + size - 3, y, x + size - 3, y + size / 2);
+  
   // Bottom arrow pointing left
   SDL_RenderDrawLine(g_renderer, x + size - 2, y + size, x + 2, y + size);
+  SDL_RenderDrawLine(g_renderer, x + size - 2, y + size - 1, x + 2, y + size - 1);
+  
   // Left side up
   SDL_RenderDrawLine(g_renderer, x + 2, y + size, x + 2, y + size / 2);
+  SDL_RenderDrawLine(g_renderer, x + 3, y + size, x + 3, y + size / 2);
 
   // Arrowhead on top right
-  draw_aa_triangle(x + size - 2, y, x + size - 6, y - 3, x + size - 6, y + 3,
-                   c);
+  draw_aa_triangle(x + size, y, x + size - 8, y - 5, x + size - 8, y + 5, c);
 }
 
 static void draw_icon_repeat_one(int x, int y, int size, Color c) {
@@ -2962,9 +2973,12 @@ static void draw_icon_repeat_one(int x, int y, int size, Color c) {
   // Draw small "1" in center
   int cx = x + size / 2;
   int cy = y + size / 2;
-  SDL_RenderDrawLine(g_renderer, cx, cy - 3, cx, cy + 3);
-  SDL_RenderDrawLine(g_renderer, cx - 2, cy - 1, cx, cy - 3);
-  SDL_RenderDrawLine(g_renderer, cx - 1, cy + 3, cx + 1, cy + 3);
+  SDL_RenderDrawLine(g_renderer, cx, cy - 4, cx, cy + 4);
+  SDL_RenderDrawLine(g_renderer, cx - 1, cy - 4, cx - 1, cy + 4);
+  SDL_RenderDrawLine(g_renderer, cx - 3, cy - 1, cx, cy - 4);
+  SDL_RenderDrawLine(g_renderer, cx - 3, cy, cx, cy - 3);
+  SDL_RenderDrawLine(g_renderer, cx - 2, cy + 4, cx + 2, cy + 4);
+  SDL_RenderDrawLine(g_renderer, cx - 2, cy + 3, cx + 2, cy + 3);
 }
 
 static void render_progress_bar(PlayerContext *ctx, WindowContext *layout,
@@ -3167,12 +3181,11 @@ static void render_controls(PlayerContext *ctx, WindowContext *layout, int w,
                                (Color){255, 255, 255}, 255);
   } else {
     /* Triangle */
-    draw_aa_triangle((float)(layout->play_button_rect.x + 20),
-                     (float)(layout->play_button_rect.y + 10),
-                     (float)(layout->play_button_rect.x + 50),
-                     (float)(layout->play_button_rect.y + 30),
-                     (float)(layout->play_button_rect.x + 20),
-                     (float)(layout->play_button_rect.y + 50),
+    int cx = layout->play_button_rect.x + layout->play_button_rect.w / 2;
+    int cy = layout->play_button_rect.y + layout->play_button_rect.h / 2;
+    draw_aa_triangle((float)(cx - 10), (float)(cy - 15),
+                     (float)(cx + 15), (float)cy,
+                     (float)(cx - 10), (float)(cy + 15),
                      (Color){255, 255, 255});
   }
 
@@ -3180,10 +3193,10 @@ static void render_controls(PlayerContext *ctx, WindowContext *layout, int w,
   {
     int cx = layout->prev_button_rect.x + layout->prev_button_rect.w / 2;
     int cy = layout->prev_button_rect.y + layout->prev_button_rect.h / 2;
-    draw_aa_triangle((float)(cx + 5), (float)(cy - 10), (float)(cx - 10),
-                     (float)cy, (float)(cx + 5), (float)(cy + 10),
+    draw_aa_triangle((float)(cx + 3), (float)(cy - 8), (float)(cx - 7),
+                     (float)cy, (float)(cx + 3), (float)(cy + 8),
                      (Color){200, 200, 200});
-    material_draw_rounded_rect(cx - 14, cy - 10, 4, 20, 1,
+    material_draw_rounded_rect(cx - 11, cy - 8, 3, 16, 1,
                                (Color){200, 200, 200}, 255);
   }
 
@@ -3191,17 +3204,17 @@ static void render_controls(PlayerContext *ctx, WindowContext *layout, int w,
   {
     int cx = layout->next_button_rect.x + layout->next_button_rect.w / 2;
     int cy = layout->next_button_rect.y + layout->next_button_rect.h / 2;
-    draw_aa_triangle((float)(cx - 5), (float)(cy - 10), (float)(cx + 10),
-                     (float)cy, (float)(cx - 5), (float)(cy + 10),
+    draw_aa_triangle((float)(cx - 3), (float)(cy - 8), (float)(cx + 7),
+                     (float)cy, (float)(cx - 3), (float)(cy + 8),
                      (Color){200, 200, 200});
-    material_draw_rounded_rect(cx + 10, cy - 10, 4, 20, 1,
+    material_draw_rounded_rect(cx + 8, cy - 8, 3, 16, 1,
                                (Color){200, 200, 200}, 255);
   }
 
   /* Shuffle Button - Use cached rect */
   {
     /* Center icon in rect */
-    int icon_sz = 16;
+    int icon_sz = 20;
     int ix = layout->shuffle_button_rect.x +
              (layout->shuffle_button_rect.w - icon_sz) / 2;
     int iy = layout->shuffle_button_rect.y +
@@ -3214,14 +3227,14 @@ static void render_controls(PlayerContext *ctx, WindowContext *layout, int w,
     if (ctx->shuffle_mode) {
       SDL_SetRenderDrawColor(g_renderer, shuf_col.r, shuf_col.g, shuf_col.b,
                              255);
-      SDL_Rect ind = {ix, iy + 24, 16, 2};
+      SDL_Rect ind = {ix + 2, iy + 26, 16, 2};
       SDL_RenderFillRect(g_renderer, &ind);
     }
   }
 
   /* Repeat Button - Use cached rect */
   {
-    int icon_sz = 16;
+    int icon_sz = 20;
     int ix = layout->repeat_button_rect.x +
              (layout->repeat_button_rect.w - icon_sz) / 2;
     int iy = layout->repeat_button_rect.y +
@@ -3238,7 +3251,7 @@ static void render_controls(PlayerContext *ctx, WindowContext *layout, int w,
 
     if (ctx->repeat_mode != REPEAT_OFF) {
       SDL_SetRenderDrawColor(g_renderer, rpt_col.r, rpt_col.g, rpt_col.b, 255);
-      SDL_Rect ind = {ix, iy + 24, 16, 2};
+      SDL_Rect ind = {ix + 2, iy + 26, 16, 2};
       SDL_RenderFillRect(g_renderer, &ind);
     }
   }

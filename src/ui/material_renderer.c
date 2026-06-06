@@ -4799,28 +4799,41 @@ const char *material_hit_test(PlayerContext *ctx, WindowContext *layout, int mx,
           return "visualizer_settings_open";
       }
     } else {
-      /* Sidebar Header Art click -> Open Album in Library */
-      /* Art is drawn at x_offset + 50, 80 with size 180x180 if album mode */
-      if (ctx->queue_type == QUEUE_TYPE_ALBUM &&
-          ctx->queue_context_art_path[0] != '\0') {
+      bool has_art = false;
+      if (ctx->sidebar_is_browsing) {
+        has_art = (ctx->browse_context_art_path[0] != '\0');
+      } else if (ctx->queue_type == QUEUE_TYPE_ALBUM) {
+        has_art = (ctx->queue_context_art_path[0] != '\0');
+      }
+
+      /* Sidebar Header Art click */
+      if (has_art) {
         int ax = x_offset + 50;
         int ay = 80;
         if (mx >= ax && mx <= ax + 180 && my >= ay && my <= ay + 180) {
-          return "open_album_context";
+          if (ctx->sidebar_is_browsing) {
+            return "play_song_0";
+          } else {
+            return "open_album_context";
+          }
         }
       }
 
       /* Queue Hit Tests */
-      int start_y = (ctx->queue_type == QUEUE_TYPE_ALBUM &&
-                     ctx->queue_context_art_path[0] != '\0')
-                        ? 280
-                        : 100;
+      int start_y = has_art ? 280 : 100;
       if (mx >= x_offset + 40 && mx <= w && my >= start_y) {
         int idx = (my - start_y + (int)ctx->sidebar_right_scroll_y) / 50;
-        size_t list_count = (ctx->queue_type == QUEUE_TYPE_ALBUM ||
-                             ctx->queue_type == QUEUE_TYPE_PLAYLIST)
-                                ? ctx->count
-                                : ctx->recents_count;
+        size_t list_count = 0;
+        
+        if (ctx->sidebar_is_browsing) {
+            list_count = ctx->browse_track_count;
+        } else if (ctx->queue_type == QUEUE_TYPE_ALBUM ||
+                   ctx->queue_type == QUEUE_TYPE_PLAYLIST) {
+            list_count = ctx->count;
+        } else {
+            list_count = ctx->recents_count;
+        }
+        
         if (idx >= 0 && idx < (int)list_count) {
           ctx->spotlight_source_rect.x = x_offset + 40;
           ctx->spotlight_source_rect.y =

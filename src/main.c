@@ -239,7 +239,7 @@ int main(int argc, char *argv[]) {
           if (app->player->spotlight_active) {
             scroll_y = &app->player->spotlight_scroll_y;
             max_scroll = &app->player->spotlight_max_scroll;
-          } else if (app->player->sidebar_right_open) {
+          } else if (app->player->sidebar_right_open && mx_w >= app->layout->sidebar_right_rect.x) {
             scroll_y = &app->player->sidebar_right_scroll_y;
             max_scroll = &app->player->sidebar_right_max_scroll;
           } else if (app->player->current_scene == SCENE_LIBRARY ||

@@ -33,6 +33,7 @@ SRCS = src/main.c \
        src/core/input_handler.c \
        src/utils/logging.c \
        src/utils/string_utils.c \
+       src/utils/path_utils.c \
        src/utils/image_loader.c \
        src/utils/color_extractor.c \
        src/utils/cam16.c \

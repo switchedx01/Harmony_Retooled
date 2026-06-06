@@ -122,7 +122,15 @@ static void scan_recursive(const char *path,
   closedir(dir);
 }
 
-Result library_init(void) { return db_init("harmony_v2.db"); }
+#include "path_utils.h"
+
+Result library_init(void) { 
+  char db_path[MAX_PATH_LENGTH];
+  if (resolve_data_path("harmony_v2.db", db_path, sizeof(db_path)) != RESULT_SUCCESS) {
+      return RESULT_ERROR_FILE_IO;
+  }
+  return db_init(db_path); 
+}
 
 Result library_scan(const char *folder_path,
                     void (*progress_cb)(const char *title, const char *artist,

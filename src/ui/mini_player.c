@@ -20,6 +20,7 @@
 #include "material_renderer.h"
 #include "player.h"
 #include "window.h"
+#include "path_utils.h"
 
 #include <SDL2/SDL_shape.h>
 #include <math.h>
@@ -118,7 +119,13 @@ static stbtt_bakedchar g_mp_cdata[96];
 static bool g_mp_font_ready = false;
 
 static void mp_font_init(SDL_Renderer *renderer) {
-  FILE *f = fopen("assets/fonts/Roboto-Regular.ttf", "rb");
+  char font_path[MAX_PATH_LENGTH];
+  FILE *f = NULL;
+  resolve_asset_path("assets/fonts/Roboto-Regular.ttf", font_path, sizeof(font_path));
+  f = fopen(font_path, "rb");
+  if (!f) {
+      f = fopen("assets/fonts/Roboto-Regular.ttf", "rb");
+  }
   if (!f)
     return;
 

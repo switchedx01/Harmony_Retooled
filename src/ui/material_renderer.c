@@ -15,6 +15,7 @@
 #include "visualizer_interface.h"
 #include "visualizer_loader.h"
 #include "window.h"
+#include "path_utils.h"
 
 #include <SDL2/SDL.h>
 #include <math.h>
@@ -268,16 +269,21 @@ static void update_animations(PlayerContext *ctx) {
 void material_init(SDL_Renderer *renderer) {
   g_renderer = renderer;
 
-  /* Load premium assets */
-  g_settings_icon =
-      load_texture_from_file(renderer, "assets/settings.png", NULL, NULL);
-  g_knob_icon = load_texture_from_file(renderer, "assets/knob.png", NULL, NULL);
+  char path[MAX_PATH_LENGTH];
+  resolve_asset_path("assets/settings.png", path, sizeof(path));
+  g_settings_icon = load_texture_from_file(renderer, path, NULL, NULL);
+
+  resolve_asset_path("assets/knob.png", path, sizeof(path));
+  g_knob_icon = load_texture_from_file(renderer, path, NULL, NULL);
 
   /* Try to load default placeholder */
-  material_set_background("placeholder.png");
+  resolve_asset_path("placeholder.png", path, sizeof(path));
+  material_set_background(path);
 
   /* Init standard font */
-  font_init(renderer, "assets/fonts/Roboto-Regular.ttf", 24.0f);
+  char font_path[MAX_PATH_LENGTH];
+  resolve_asset_path("assets/fonts/Roboto-Regular.ttf", font_path, sizeof(font_path));
+  font_init(renderer, font_path, 24.0f);
 }
 
 void material_shutdown(void) {

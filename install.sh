@@ -31,11 +31,23 @@ echo "Step 3: Installing binary..."
 cp harmony_player "$BIN_DIR/harmony_player"
 chmod 755 "$BIN_DIR/harmony_player"
 
-echo "Step 4: Installing App Icon..."
+echo "Step 4: Installing App Icon and Assets..."
 if [ -f "assets/icons/harmony_icon.png" ]; then
     cp "assets/icons/harmony_icon.png" "$ICONS_DIR/harmony_player.png"
 else
-    echo "Warning: Icon 'assets/icons/harmony_icon.png' not found. It may be missing from the background."
+    echo "Warning: Icon 'assets/icons/harmony_icon.png' not found."
+fi
+
+mkdir -p "$SHARE_DIR/harmony_player"
+if [ -d "assets" ]; then
+    cp -r assets "$SHARE_DIR/harmony_player/"
+    echo "Assets installed to $SHARE_DIR/harmony_player/assets"
+else
+    echo "Warning: 'assets' directory not found."
+fi
+
+if [ -f "placeholder.png" ]; then
+    cp placeholder.png "$SHARE_DIR/harmony_player/"
 fi
 
 echo "Step 5: Installing Desktop Entry and File Associations..."

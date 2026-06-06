@@ -7,3 +7,9 @@ tests/test_playback
 # Log files
 *.log
 cli_log.txt
+*.db
+*.db-shm
+*.db-wal
+harmony_player
+a.out
+build/

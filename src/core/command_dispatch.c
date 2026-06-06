@@ -23,6 +23,25 @@ static void start_playback_helper(PlayerContext *ctx);
 static void on_scan_progress(const char *title, const char *artist,
                              float percent);
 
+static int updater_thread_func(void *data) {
+    PlayerContext *ctx = (PlayerContext *)data;
+    FILE *fp = popen("python3 scripts/updater.py", "r");
+    if (!fp) {
+        strncpy(ctx->update_status_msg, "Failed to start updater script", sizeof(ctx->update_status_msg) - 1);
+        return 0;
+    }
+    char line[128];
+    while (fgets(line, sizeof(line), fp)) {
+        size_t len = strlen(line);
+        if (len > 0 && line[len-1] == '\n') line[len-1] = '\0';
+        if (len > 0) {
+            strncpy(ctx->update_status_msg, line, sizeof(ctx->update_status_msg) - 1);
+        }
+    }
+    pclose(fp);
+    return 0;
+}
+
 static void try_load_cover_art_helper(Song *s) {
   char *art_path = extract_album_art(s->path);
   if (art_path) {
@@ -442,6 +461,14 @@ bool dispatch_command(AppContext *ctx, const char *cmd, int mx_context) {
     g_player_ctx->setting_gapless = !g_player_ctx->setting_gapless;
   } else if (strcmp(cmd, "settings_toggle_normalization") == 0) {
     g_player_ctx->setting_normalization = !g_player_ctx->setting_normalization;
+  } else if (strcmp(cmd, "settings_check_updates") == 0) {
+    /* Set update status message showing next release info */
+    strncpy(g_player_ctx->update_status_msg, 
+            "Starting updater...", 
+            sizeof(g_player_ctx->update_status_msg) - 1);
+            
+    SDL_CreateThread(updater_thread_func, "UpdaterThread", g_player_ctx);
+    
   } else if (strcmp(cmd, "settings_reset_database") == 0) {
     /* Show confirmation dialog instead of resetting immediately */
     g_player_ctx->confirm_dialog_open = true;

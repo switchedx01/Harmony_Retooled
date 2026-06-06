@@ -4,6 +4,8 @@
 #include "common.h"
 #include "database.h" /* pulls in EQ_BAND_COUNT_MAX + EqPreset */
 
+#define HARMONY_VERSION "v2.0.02-beta (Moonlight)"
+
 typedef enum {
   PLAYER_STATE_STOPPED,
   PLAYER_STATE_PLAYING,
@@ -225,25 +227,29 @@ typedef struct {
   bool setting_normalization;
   bool setting_gapless;
 
+  /* Updater State */
+  char update_status_msg[128];
+
   /* -----------------------------------------------------------------------
      EQ State
      ----------------------------------------------------------------------- */
-  bool eq_popup_open;             /* EQ popup is visible */
-  bool eq_enabled;                /* EQ chain is active (bypass when false) */
-  int  eq_band_count;             /* 5 or 10 */
+  bool eq_popup_open; /* EQ popup is visible */
+  bool eq_enabled;    /* EQ chain is active (bypass when false) */
+  int eq_band_count;  /* 5 or 10 */
   float eq_gains[EQ_BAND_COUNT_MAX]; /* Current gains in dB (-12 to +12) */
 
-  /* Preset selection: -1 = built-in (no delete allowed), >= 0 = user preset id */
-  int eq_selected_preset_id;      /* -1 for a built-in preset */
+  /* Preset selection: -1 = built-in (no delete allowed), >= 0 = user preset id
+   */
+  int eq_selected_preset_id;        /* -1 for a built-in preset */
   char eq_selected_preset_name[64]; /* display name of active preset */
-  bool eq_is_new_mode;            /* user selected "New" from dropdown */
-  char eq_new_preset_name[64];    /* name input buffer while saving */
-  bool eq_typing_preset_name;     /* text input active for preset name */
-  bool eq_dropdown_open;          /* preset dropdown is expanded */
+  bool eq_is_new_mode;              /* user selected "New" from dropdown */
+  char eq_new_preset_name[64];      /* name input buffer while saving */
+  bool eq_typing_preset_name;       /* text input active for preset name */
+  bool eq_dropdown_open;            /* preset dropdown is expanded */
 
   /* EQ Preset Cache (loaded from DB) */
   EqPreset *eq_presets;
-  size_t    eq_preset_count;
+  size_t eq_preset_count;
 } PlayerContext;
 
 /* Core Player API */

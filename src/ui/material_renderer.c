@@ -2709,10 +2709,22 @@ static void render_settings_popup(PlayerContext *ctx, int w, int h) {
       current_y += 40;
     }
   } else {
-    font_draw_text(g_renderer, "Harmony v2.0", px + 30, tab_content_y, 255, 255,
-                   255);
-    font_draw_text(g_renderer, "Built with C and SDL2", px + 30,
-                   tab_content_y + 40, 150, 150, 150);
+    font_draw_text(g_renderer, "Harmony " HARMONY_VERSION, px + 30, tab_content_y, 255, 255, 255);
+    font_draw_text(g_renderer, "Built with C and SDL2", px + 30, tab_content_y + 40, 150, 150, 150);
+
+    /* Manual Updater Section */
+    int btn_w = 200;
+    int btn_h = 40;
+    int btn_y = tab_content_y + 80;
+    material_draw_rounded_rect(px + 30, btn_y, btn_w, btn_h, 6, g_theme.primary, 255);
+    int btw = font_get_text_width("Check for Updates");
+    int btn_ty; 
+    font_get_text_center_offset("Check for Updates", btn_w, btn_h, NULL, &btn_ty);
+    font_draw_text(g_renderer, "Check for Updates", px + 30 + (btn_w - btw) / 2, btn_y + btn_ty, 255, 255, 255);
+
+    if (ctx->update_status_msg[0] != '\0') {
+      font_draw_text(g_renderer, ctx->update_status_msg, px + 30 + btn_w + 20, btn_y + btn_ty, 200, 200, 200);
+    }
   }
 
   int btw = font_get_text_width("Close");
@@ -4300,6 +4312,14 @@ const char *material_hit_test(PlayerContext *ctx, WindowContext *layout, int mx,
       /* Normalization Toggle */
       if (material_hit_test_rect(cx, current_y + (30 - 20) / 2, 20, 20, mx, my)) {
         return "settings_toggle_normalization";
+      }
+    } else if (ctx->settings_active_tab == 2) {
+      int tab_content_y = py + 80;
+      int btn_w = 200;
+      int btn_h = 40;
+      int btn_y = tab_content_y + 80;
+      if (material_hit_test_rect(px + 30, btn_y, btn_w, btn_h, mx, my)) {
+        return "settings_check_updates";
       }
     }
     return "blocked";

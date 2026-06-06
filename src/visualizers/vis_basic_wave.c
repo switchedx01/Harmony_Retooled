@@ -153,10 +153,19 @@ static void basic_render(SDL_Renderer *renderer, const float *audio_data,
     x_step *= 0.5f;
   }
 
-  int prev_px = -1;
-  int prev_py = -1;
+  int res_limit = g_resolution;
+  if (res_limit > 2048) res_limit = 2048;
+  if (res_limit < 1) res_limit = 1;
 
-  for (int i = 0; i < g_resolution; i++) {
+  int *computed_x = malloc(sizeof(int) * res_limit);
+  int *computed_y = malloc(sizeof(int) * res_limit);
+  if (!computed_x || !computed_y) {
+    if (computed_x) free(computed_x);
+    if (computed_y) free(computed_y);
+    return;
+  }
+
+  for (int i = 0; i < res_limit; i++) {
     int idx = (int)(i * step);
     if (idx >= (int)sample_count)
       idx = (int)sample_count - 1;
@@ -176,44 +185,93 @@ static void basic_render(SDL_Renderer *renderer, const float *audio_data,
     if (py > y + h)
       py = y + h;
 
-    int cur_x = x + (int)(i * x_step);
+    computed_x[i] = x + (int)(i * x_step);
+    computed_y[i] = py;
+  }
 
-    // Render styles
-    if (g_draw_style == 0) { // Lines
-      if (prev_px != -1) {
-        for (int t = 0; t < g_thickness; t++) {
-          SDL_RenderDrawLine(renderer, prev_px, prev_py + t - g_thickness / 2,
-                             cur_x, py + t - g_thickness / 2);
-          if (g_mirror_mode) {
-            SDL_RenderDrawLine(renderer, (x + w) - (prev_px - x),
-                               prev_py + t - g_thickness / 2,
-                               (x + w) - (cur_x - x), py + t - g_thickness / 2);
+  // Draw style 0: Lines
+  if (g_draw_style == 0) {
+    SDL_Point *pts = malloc(sizeof(SDL_Point) * res_limit);
+    if (pts) {
+      for (int t = 0; t < g_thickness; t++) {
+        int offset = t - g_thickness / 2;
+        for (int i = 0; i < res_limit; i++) {
+          pts[i].x = computed_x[i];
+          pts[i].y = computed_y[i] + offset;
+        }
+        SDL_RenderDrawLines(renderer, pts, res_limit);
+
+        if (g_mirror_mode) {
+          for (int i = 0; i < res_limit; i++) {
+            pts[i].x = (x + w) - (computed_x[i] - x);
+            pts[i].y = computed_y[i] + offset;
           }
+          SDL_RenderDrawLines(renderer, pts, res_limit);
         }
       }
-    } else if (g_draw_style == 1) { // Points
-      SDL_Rect pt = {cur_x - g_thickness / 2, py - g_thickness / 2, g_thickness,
-                     g_thickness};
-      SDL_RenderFillRect(renderer, &pt);
-      if (g_mirror_mode) {
-        pt.x = (x + w) - (cur_x - x) - g_thickness / 2;
-        SDL_RenderFillRect(renderer, &pt);
-      }
-    } else if (g_draw_style == 2) { // Bars
-      int bar_h = abs(py - cy);
-      SDL_Rect bar = {cur_x, (py < cy ? py : cy), (int)x_step, bar_h};
-      if (bar.w < 1)
-        bar.w = 1;
-      SDL_RenderFillRect(renderer, &bar);
-      if (g_mirror_mode) {
-        bar.x = (x + w) - (cur_x - x) - bar.w;
-        SDL_RenderFillRect(renderer, &bar);
-      }
+      free(pts);
     }
-
-    prev_px = cur_x;
-    prev_py = py;
   }
+  // Draw style 1: Points
+  else if (g_draw_style == 1) {
+    int max_rects = g_mirror_mode ? res_limit * 2 : res_limit;
+    SDL_Rect *pts = malloc(sizeof(SDL_Rect) * max_rects);
+    if (pts) {
+      int rect_count = 0;
+      for (int i = 0; i < res_limit; i++) {
+        pts[rect_count++] = (SDL_Rect){
+          computed_x[i] - g_thickness / 2,
+          computed_y[i] - g_thickness / 2,
+          g_thickness,
+          g_thickness
+        };
+        if (g_mirror_mode) {
+          pts[rect_count++] = (SDL_Rect){
+            (x + w) - (computed_x[i] - x) - g_thickness / 2,
+            computed_y[i] - g_thickness / 2,
+            g_thickness,
+            g_thickness
+          };
+        }
+      }
+      SDL_RenderFillRects(renderer, pts, rect_count);
+      free(pts);
+    }
+  }
+  // Draw style 2: Bars
+  else if (g_draw_style == 2) {
+    int max_rects = g_mirror_mode ? res_limit * 2 : res_limit;
+    SDL_Rect *bars = malloc(sizeof(SDL_Rect) * max_rects);
+    if (bars) {
+      int rect_count = 0;
+      for (int i = 0; i < res_limit; i++) {
+        int py = computed_y[i];
+        int bar_h = abs(py - cy);
+        int bar_w = (int)x_step;
+        if (bar_w < 1) bar_w = 1;
+
+        bars[rect_count++] = (SDL_Rect){
+          computed_x[i],
+          (py < cy ? py : cy),
+          bar_w,
+          bar_h
+        };
+        if (g_mirror_mode) {
+          bars[rect_count++] = (SDL_Rect){
+            (x + w) - (computed_x[i] - x) - bar_w,
+            (py < cy ? py : cy),
+            bar_w,
+            bar_h
+          };
+        }
+      }
+      SDL_RenderFillRects(renderer, bars, rect_count);
+      free(bars);
+    }
+  }
+
+  free(computed_x);
+  free(computed_y);
 }
 
 const VisPlugin g_vis_basic_wave = {.name = "Basic Waveform",
@@ -224,3 +282,5 @@ const VisPlugin g_vis_basic_wave = {.name = "Basic Waveform",
                                     .resize = NULL,
                                     .get_param_count = basic_get_param_count,
                                     .get_param = basic_get_param};
+
+const VisPlugin *visualizer_get_info(void) { return &g_vis_basic_wave; }

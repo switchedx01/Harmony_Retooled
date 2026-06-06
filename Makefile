@@ -3,7 +3,7 @@ CC = gcc
 UNAME_S := $(shell uname -s)
 
 # Include paths for new structure
-CFLAGS = -std=c99 -Wall -Wextra -Wpedantic \
+CFLAGS = -std=c99 -Wall -Wextra -Wpedantic -O3 \
          -Iinclude -Iinclude/core -Iinclude/ui -Iinclude/audio \
          -Iinclude/data -Iinclude/features -Iinclude/utils -Iinclude/visualizers \
          -Iinclude/vendor -D_POSIX_C_SOURCE=200809L
@@ -90,4 +90,4 @@ build/%.o: src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -rf $(BUILD_DIR) $(TARGET)
+	rm -rf $(BUILD_DIR) $(TARGET) visualizers/*.so

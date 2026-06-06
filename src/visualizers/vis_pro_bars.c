@@ -452,7 +452,6 @@ static void get_bar_color(int bar_index, int total_bars, float bar_height,
 
 static void draw_rounded_rect(SDL_Renderer *renderer, int x, int y, int w,
                               int h, float radius_factor) {
-  // Simplified rounded rect - uses corner pixels
   int radius = (int)(fminf(w, h) * 0.5f * radius_factor);
   if (radius < 1 || radius_factor < 0.01f) {
     SDL_Rect rect = {x, y, w, h};
@@ -460,28 +459,32 @@ static void draw_rounded_rect(SDL_Renderer *renderer, int x, int y, int w,
     return;
   }
 
-  // Draw main body rectangles
-  SDL_Rect body_v = {x + radius, y, w - 2 * radius, h};
-  SDL_Rect body_h = {x, y + radius, w, h - 2 * radius};
-  SDL_RenderFillRect(renderer, &body_v);
-  SDL_RenderFillRect(renderer, &body_h);
+  // Draw rounded rect as a collection of scanline rects (single batch call)
+  SDL_Rect rects[66];
+  int rect_count = 0;
 
-  // Draw corners (simplified circle fill)
-  for (int cy = 0; cy < radius; cy++) {
-    for (int cx = 0; cx < radius; cx++) {
-      float dist = sqrtf((float)(cx * cx + cy * cy));
-      if (dist <= radius) {
-        // Top-left
-        SDL_RenderDrawPoint(renderer, x + radius - cx - 1, y + radius - cy - 1);
-        // Top-right
-        SDL_RenderDrawPoint(renderer, x + w - radius + cx, y + radius - cy - 1);
-        // Bottom-left
-        SDL_RenderDrawPoint(renderer, x + radius - cx - 1, y + h - radius + cy);
-        // Bottom-right
-        SDL_RenderDrawPoint(renderer, x + w - radius + cx, y + h - radius + cy);
-      }
+  // Center body
+  if (h - 2 * radius > 0) {
+    rects[rect_count++] = (SDL_Rect){x, y + radius, w, h - 2 * radius};
+  }
+
+  // Top and bottom rows
+  for (int r = 0; r < radius; r++) {
+    int dy = radius - 1 - r;
+    int dx = (int)sqrtf(radius * radius - dy * dy);
+    int offset = radius - dx;
+
+    // Top row
+    rects[rect_count++] = (SDL_Rect){x + offset, y + r, w - 2 * offset, 1};
+    // Bottom row
+    rects[rect_count++] = (SDL_Rect){x + offset, y + h - 1 - r, w - 2 * offset, 1};
+
+    if (rect_count >= 64) {
+      break;
     }
   }
+
+  SDL_RenderFillRects(renderer, rects, rect_count);
 }
 
 static void draw_bar_glow(SDL_Renderer *renderer, int x, int y, int w, int h,
@@ -696,15 +699,21 @@ static void pro_bars_render(SDL_Renderer *renderer, const float *audio_data,
         seg_h = 2;
       int seg_gap = (int)(seg_h * g_segment_gap);
 
-      for (int seg = 0; seg < g_segment_count; seg++) {
+      SDL_Rect seg_rects[64];
+      int seg_to_draw = 0;
+
+      for (int seg = 0; seg < g_segment_count && seg < 64; seg++) {
         int seg_y = bar_y + bar_h - (seg + 1) * seg_h + seg_gap / 2;
         if (seg_y < bar_y)
           break;
 
         SDL_Rect seg_rect = {bar_x, seg_y, bar_w, seg_h - seg_gap};
         if (seg_rect.h > 0) {
-          SDL_RenderFillRect(renderer, &seg_rect);
+          seg_rects[seg_to_draw++] = seg_rect;
         }
+      }
+      if (seg_to_draw > 0) {
+        SDL_RenderFillRects(renderer, seg_rects, seg_to_draw);
       }
     }
 

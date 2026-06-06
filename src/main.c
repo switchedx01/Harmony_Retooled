@@ -160,6 +160,12 @@ int main(int argc, char *argv[]) {
         window_get_mouse_pos(&mx, &my);
         bool is_right_click = (evt.button == SDL_BUTTON_RIGHT);
 
+        /* Reset all drag states on new click to prevent stuck drags */
+        app->is_dragging_seek = false;
+        app->is_dragging_vol = false;
+        app->is_dragging_eq_band = false;
+        app->is_dragging_vis_param = false;
+
         /* Hit test returns a command string */
         const char *cmd =
             material_hit_test(app->player, app->layout, mx, my, is_right_click);

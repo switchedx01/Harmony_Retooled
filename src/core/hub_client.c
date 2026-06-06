@@ -23,8 +23,8 @@ static void reset_socket(void) {
     zmq_sock = zmq_socket(zmq_ctx, ZMQ_REQ);
     if (!zmq_sock) return;
     
-    // Set send and receive timeouts to prevent blocking the main thread (100ms)
-    int timeout_ms = 100;
+    // Set send and receive timeouts to prevent blocking the main thread (5ms)
+    int timeout_ms = 5;
     zmq_setsockopt(zmq_sock, ZMQ_SNDTIMEO, &timeout_ms, sizeof(timeout_ms));
     zmq_setsockopt(zmq_sock, ZMQ_RCVTIMEO, &timeout_ms, sizeof(timeout_ms));
     

@@ -2373,136 +2373,44 @@ static void refresh_playlists_cache(PlayerContext *ctx) {
 
 static void render_playlists_scene(SDL_Renderer *renderer, PlayerContext *ctx,
                                    int x, int y, int w, int h) {
+  (void)ctx;
   /* Header for Playlists */
-  font_draw_text(renderer, "Your Playlists", x + 50, y + 40, 255, 255, 255);
+  font_draw_text(renderer, "Playlists", x + 50, y + 40, 255, 255, 255);
 
-  /* Tab Content */
-  render_playlists_grid(ctx, x, y, w, h);
+  /* Modern Glassmorphic Container */
+  int card_w = 480;
+  int card_h = 240;
+  int card_x = x + (w - card_w) / 2;
+  int card_y = y + (h - card_h) / 2;
 
-  /* Render FAB (Floating Action Button) for adding playlist */
-  int fab_size = 56;
-  int fab_x = x + w - fab_size - 30;
-  int fab_y = y + h - fab_size - 30;
+  /* Draw frosted glass base */
+  material_draw_rounded_rect(card_x, card_y, card_w, card_h, 16, (Color){25, 25, 25}, 200);
 
-  /* Shadow */
-  draw_filled_circle(fab_x + fab_size / 2, fab_y + fab_size / 2 + 4,
-                     fab_size / 2, (Color){0, 0, 0}, 100);
-  /* Button */
-  draw_filled_circle(fab_x + fab_size / 2, fab_y + fab_size / 2, fab_size / 2,
-                     g_theme.primary, 255);
-  /* Plus Icon */
-  int cx = fab_x + fab_size / 2;
-  int cy = fab_y + fab_size / 2;
-  SDL_SetRenderDrawColor(g_renderer, 255, 255, 255, 255);
-  SDL_Rect h_bar = {cx - 10, cy - 2, 20, 4};
-  SDL_Rect v_bar = {cx - 2, cy - 10, 4, 20};
-  SDL_RenderFillRect(g_renderer, &h_bar);
-  SDL_RenderFillRect(g_renderer, &v_bar);
+  /* Draw a subtle colored top bar using the theme's primary color to feel premium */
+  SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+  SDL_SetRenderDrawColor(renderer, g_theme.primary.r, g_theme.primary.g, g_theme.primary.b, 255);
+  SDL_Rect accent_bar = {card_x + 20, card_y, card_w - 40, 3};
+  SDL_RenderFillRect(renderer, &accent_bar);
 
-  /* FAB Interaction */
-  int mx, my;
-  window_get_mouse_pos(&mx, &my);
-  bool fab_hover = (mx >= fab_x && mx <= fab_x + fab_size && my >= fab_y &&
-                    my <= fab_y + fab_size);
+  /* Main Title: Under Development */
+  const char *title = "Under Development";
+  int tw_title = font_get_text_width(title);
+  int tx_title = card_x + (card_w - tw_title) / 2;
+  int ty_title = card_y + 85;
+  font_draw_text(renderer, title, tx_title, ty_title, 255, 255, 255);
 
-  if (fab_hover) {
-    draw_filled_circle(cx, cy, fab_size / 2, (Color){255, 255, 255}, 50);
-    if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
-      if (SDL_GetTicks() - g_last_click_time > MIN_CLICK_DELAY_MS) {
-        ctx->is_creating_playlist = true;
-        ctx->new_playlist_name[0] = '\0';
-        g_last_click_time = SDL_GetTicks();
-        SDL_StartTextInput();
-      }
-    }
-  }
+  /* Subtitle/Description */
+  const char *desc = "This feature is currently being redesigned.";
+  int tw_desc = font_get_text_width(desc);
+  int tx_desc = card_x + (card_w - tw_desc) / 2;
+  int ty_desc = card_y + 135;
+  font_draw_text(renderer, desc, tx_desc, ty_desc, 150, 150, 150);
 
-  /* New Playlist Dialog Overlay */
-  if (ctx->is_creating_playlist) {
-    /* Darken bg */
-    SDL_SetRenderDrawBlendMode(g_renderer, SDL_BLENDMODE_BLEND);
-    SDL_SetRenderDrawColor(g_renderer, 0, 0, 0, 180);
-    SDL_Rect screen = {0, 0, 2000, 2000}; /* Covers all */
-    SDL_RenderFillRect(g_renderer, &screen);
-
-    int dw = 400;
-    int dh = 200;
-    int dx = x + (w - dw) / 2;
-    int dy = y + (h - dh) / 2;
-
-    material_draw_rounded_rect(dx, dy, dw, dh, 12, g_theme.surface, 255);
-    font_draw_text(g_renderer, "Create New Playlist", dx + 20, dy + 20, 255,
-                   255, 255);
-
-    /* Input Box */
-    int input_h = 40;
-    int input_y = dy + 60;
-    material_draw_rounded_rect(dx + 20, input_y, dw - 40, input_h, 6,
-                               (Color){30, 30, 30}, 255);
-
-    /* Vertically center text in input */
-    int text_h = 24; /* Approx font height */
-    int text_y = input_y + (input_h - text_h) / 2 + 4;
-    font_draw_text(g_renderer, ctx->new_playlist_name, dx + 30, text_y, 255,
-                   255, 255);
-
-    /* Cursor */
-    if ((SDL_GetTicks() / 500) % 2 == 0) {
-      int tw = font_get_text_width(ctx->new_playlist_name);
-      SDL_SetRenderDrawColor(g_renderer, 255, 255, 255, 255);
-      SDL_RenderDrawLine(g_renderer, dx + 30 + tw, text_y, dx + 30 + tw,
-                         text_y + 20);
-    }
-
-    /* Buttons */
-    int btn_w = 100;
-    int btn_h = 40;
-    int btn_y = dy + dh - 60;
-
-    /* Cancel */
-    int cancel_x = dx + 30; /* Left side aligned */
-    material_draw_rounded_rect(cancel_x, btn_y, btn_w, btn_h, 6,
-                               (Color){50, 50, 50}, 255);
-    int c_tw = font_get_text_width("Cancel");
-    int c_ty = btn_y + (btn_h - 20) / 2 + 2;
-    font_draw_text(g_renderer, "Cancel", cancel_x + (btn_w - c_tw) / 2, c_ty,
-                   255, 255, 255);
-
-    /* Cancel Click */
-    if (material_hit_test_rect(cancel_x, btn_y, btn_w, btn_h, mx, my)) {
-      if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
-        ctx->is_creating_playlist = false;
-        SDL_StopTextInput();
-      }
-    }
-
-    /* Create */
-    int create_x = dx + dw - 30 - btn_w; /* Right side aligned */
-    material_draw_rounded_rect(
-        create_x, btn_y, btn_w, btn_h, 6,
-        (ctx->new_playlist_name[0] ? g_theme.primary : (Color){60, 60, 60}),
-        255); /* Dim if empty */
-    int cr_tw = font_get_text_width("Create");
-    int cr_ty = btn_y + (btn_h - 20) / 2 + 2;
-    font_draw_text(g_renderer, "Create", create_x + (btn_w - cr_tw) / 2, cr_ty,
-                   255, 255, 255);
-
-    /* Create Click */
-    if (material_hit_test_rect(create_x, btn_y, btn_w, btn_h, mx, my)) {
-      if (ctx->new_playlist_name[0]) {
-        if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
-          if (SDL_GetTicks() - g_last_click_time > MIN_CLICK_DELAY_MS) {
-            db_create_playlist(ctx->new_playlist_name);
-            ctx->is_creating_playlist = false;
-            SDL_StopTextInput();
-            /* Refresh playlists */
-            refresh_playlists_cache(ctx);
-            g_last_click_time = SDL_GetTicks();
-          }
-        }
-      }
-    }
-  }
+  const char *desc2 = "Stay tuned for updates!";
+  int tw_desc2 = font_get_text_width(desc2);
+  int tx_desc2 = card_x + (card_w - tw_desc2) / 2;
+  int ty_desc2 = card_y + 170;
+  font_draw_text(renderer, desc2, tx_desc2, ty_desc2, 110, 110, 110);
 }
 
 static void render_content(PlayerContext *ctx, int w, int h) {

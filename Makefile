@@ -19,8 +19,14 @@ ifneq ($(UNAME_S),Darwin)
 endif
 
 # Visualizer Plugins
-VIS_SRCS = src/visualizers/vis_oscilloscope.c src/visualizers/vis_basic_wave.c src/visualizers/vis_pro_bars.c
-VIS_PLUGINS = visualizers/vis_oscilloscope.so visualizers/vis_basic_wave.so visualizers/vis_pro_bars.so
+VIS_SRCS = src/visualizers/vis_oscilloscope.c src/visualizers/vis_basic_wave.c src/visualizers/vis_pro_bars.c \
+           src/visualizers/vis_circular_spectrum.c \
+           src/visualizers/vis_particle_constellation.c \
+           src/visualizers/vis_liquid_plasma.c
+VIS_PLUGINS = visualizers/vis_oscilloscope.so visualizers/vis_basic_wave.so visualizers/vis_pro_bars.so \
+              visualizers/vis_circular_spectrum.so \
+              visualizers/vis_particle_constellation.so \
+              visualizers/vis_liquid_plasma.so
 
 # Shared flags for plugins
 PLUGIN_CFLAGS = $(CFLAGS) -fPIC

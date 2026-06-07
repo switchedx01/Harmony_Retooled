@@ -32,10 +32,10 @@ cp harmony_player "$BIN_DIR/harmony_player"
 chmod 755 "$BIN_DIR/harmony_player"
 
 echo "Step 4: Installing App Icon and Assets..."
-if [ -f "assets/icons/harmony_icon.png" ]; then
-    cp "assets/icons/harmony_icon.png" "$ICONS_DIR/harmony_player.png"
+if [ -f "assets/icons/harmony_logo.png" ]; then
+    cp "assets/icons/harmony_logo.png" "$ICONS_DIR/harmony_player.png"
 else
-    echo "Warning: Icon 'assets/icons/harmony_icon.png' not found."
+    echo "Warning: Icon 'assets/icons/harmony_logo.png' not found."
 fi
 
 mkdir -p "$SHARE_DIR/harmony_player"
@@ -55,8 +55,8 @@ cat <<EOF > "$APPS_DIR/harmony_player.desktop"
 [Desktop Entry]
 Name=Harmony Player
 Comment=A modern, sleek audio player
-Exec=harmony_player %U
-Icon=harmony_player
+Exec=$BIN_DIR/harmony_player %U
+Icon=$ICONS_DIR/harmony_player.png
 Terminal=false
 Type=Application
 Categories=AudioVideo;Audio;Player;
